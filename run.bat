@@ -1,0 +1,1 @@
+C:\libs-msys\bin\chess.exe
