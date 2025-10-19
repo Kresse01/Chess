@@ -322,6 +322,30 @@ src/gen/ch_legalize.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.s
 .PHONY : src/gen/ch_legalize.cpp.s
 
+src/gen/ch_movegen.obj: src/gen/ch_movegen.cpp.obj
+.PHONY : src/gen/ch_movegen.obj
+
+# target to build an object file
+src/gen/ch_movegen.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj
+.PHONY : src/gen/ch_movegen.cpp.obj
+
+src/gen/ch_movegen.i: src/gen/ch_movegen.cpp.i
+.PHONY : src/gen/ch_movegen.i
+
+# target to preprocess a source file
+src/gen/ch_movegen.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.i
+.PHONY : src/gen/ch_movegen.cpp.i
+
+src/gen/ch_movegen.s: src/gen/ch_movegen.cpp.s
+.PHONY : src/gen/ch_movegen.s
+
+# target to generate assembly for a file
+src/gen/ch_movegen.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.s
+.PHONY : src/gen/ch_movegen.cpp.s
+
 src/pieces/ch_piece.obj: src/pieces/ch_piece.cpp.obj
 .PHONY : src/pieces/ch_piece.obj
 
@@ -402,6 +426,9 @@ help:
 	@echo ... src/gen/ch_legalize.obj
 	@echo ... src/gen/ch_legalize.i
 	@echo ... src/gen/ch_legalize.s
+	@echo ... src/gen/ch_movegen.obj
+	@echo ... src/gen/ch_movegen.i
+	@echo ... src/gen/ch_movegen.s
 	@echo ... src/pieces/ch_piece.obj
 	@echo ... src/pieces/ch_piece.i
 	@echo ... src/pieces/ch_piece.s

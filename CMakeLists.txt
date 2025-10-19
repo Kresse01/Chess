@@ -23,7 +23,8 @@ add_library(chess_core
     src/analysis/ch_pins.cpp
     src/analysis/ch_legality.cpp
     src/gen/ch_legal_masks.cpp
-    src/gen/ch_legalize.cpp)
+    src/gen/ch_legalize.cpp
+    src/gen/ch_movegen.cpp)
 target_include_directories(chess_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Warnings

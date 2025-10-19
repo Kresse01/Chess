@@ -26,11 +26,11 @@ namespace ch
         if (c==Color::White)
         {
             BB one = (from << 8) & empty;
-            BB two = (o.allow_double_push ? ((one<<8) & empty) & RANK_MASK[3] : 0); //land on rank 4
+            BB two = ((s >> 3) == 1) ? ((one << 8) & empty) : 0;
             return one | two;
         } else {
             BB one = (from >> 8) & empty;
-            BB two = (o.allow_double_push ? ((one>>8) & empty) & RANK_MASK[4]: 0); //land on rank 5
+            BB two = ((s >> 3) == 6) ? ((one >> 8) & empty) : 0;
             return one | two;
         }
     }

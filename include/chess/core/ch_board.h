@@ -57,8 +57,8 @@ namespace ch
         int ep_target() const { return ep_sq_; } // -1 if none
 
         /** @brief Castling right flags. */
-        bool castle_k(int c) const { return castle_[c][0]; }
-        bool castle_q(int c) const { return castle_[c][1]; }
+        bool castle_k(Color c) const { return castle_[static_cast<int>(c)][0]; }
+        bool castle_q(Color c) const { return castle_[static_cast<int>(c)][1]; }
         /** @} */
 
         /**@name (Optional) mutation helpers for future make/unmake

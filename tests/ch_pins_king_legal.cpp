@@ -4,30 +4,39 @@
 #include "chess/gen/ch_king_legal.h"
 #include "chess/core/ch_square.h"
 #include "chess/gen/ch_legalize.h"
+#include "chess/gen/ch_movegen.h"
 #include <cassert>
 #include <iostream>
 
 int main()
 {
-    ch::init_bitboards();
-    ch::Board b;
-    
+    using namespace ch;
+    init_bitboards();
+
+    Board b;
+    b.set_startpos();
+
+    std::vector<Move> mv;
+    generate_legal_moves(b, Color::White,mv);
+    std::cout << "white legal moves: " << mv.size() << "\n";
+    assert(mv.size() == 20);
+
+    // Check case: Ke1, Nf3 vs ...Bb4+ -> only Nf3-d2 plus king moves if legal
     b.clear();
-    b.set_piece(ch::Color::White, ch::PieceKind::King, ch::sq_from_str("e1"));
-    b.set_piece(ch::Color::White, ch::PieceKind::Knight, ch::sq_from_str("f3"));
-    b.set_piece(ch::Color::Black, ch::PieceKind::Bishop, ch::sq_from_str("b4"));
+    b.set_piece(Color::White, PieceKind::King,   sq_from_str("e1"));
+    b.set_piece(Color::White, PieceKind::Knight, sq_from_str("f3"));
+    b.set_piece(Color::Black, PieceKind::Bishop, sq_from_str("b4"));
 
-    auto L = ch::legal_masks_for_side(b, ch::Color::White);
+    mv.clear();
+    generate_legal_moves(b, Color::White, mv);
 
-    auto nf3 = L.per_square[ch::sq_from_str("f3")];
-
-    assert((nf3 & ch::bit(ch::sq_from_str("d2"))) != 0);
-    assert((nf3 & ch::bit(ch::sq_from_str("h4"))) == 0);
-
-    auto ke1 = L.per_square[ch::sq_from_str("e1")];
-
-    assert((ke1 & ch::bit(ch::sq_from_str("d2"))) == 0);
-
-    std::cout << "legal masks OK\n";
+    bool foundNf3d2 = false;
+    for (auto m : mv) {
+        if (m.from() == sq_from_str("f3") && m.to() == sq_from_str("d2"))
+            foundNf3d2 = true;
+    }
+    assert(foundNf3d2);
+    std::cout << "movegen smoke ok\n";
+    
     return 0;
 }

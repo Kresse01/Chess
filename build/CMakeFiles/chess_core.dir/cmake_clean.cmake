@@ -13,6 +13,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj.d"
   "CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj"
   "CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj.d"
+  "CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj"
+  "CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj.d"
   "CMakeFiles/chess_core.dir/src/pieces/ch_piece.cpp.obj"
   "CMakeFiles/chess_core.dir/src/pieces/ch_piece.cpp.obj.d"
   "libchess_core.a"

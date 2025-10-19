@@ -15,6 +15,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "C:/Users/gusta/Desktop/Chess/src/core/ch_board.cpp" "CMakeFiles/chess_core.dir/src/core/ch_board.cpp.obj" "gcc" "CMakeFiles/chess_core.dir/src/core/ch_board.cpp.obj.d"
   "C:/Users/gusta/Desktop/Chess/src/gen/ch_legal_masks.cpp" "CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj" "gcc" "CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj.d"
   "C:/Users/gusta/Desktop/Chess/src/gen/ch_legalize.cpp" "CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj" "gcc" "CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj.d"
+  "C:/Users/gusta/Desktop/Chess/src/gen/ch_movegen.cpp" "CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj" "gcc" "CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj.d"
   "C:/Users/gusta/Desktop/Chess/src/pieces/ch_piece.cpp" "CMakeFiles/chess_core.dir/src/pieces/ch_piece.cpp.obj" "gcc" "CMakeFiles/chess_core.dir/src/pieces/ch_piece.cpp.obj.d"
   )
 

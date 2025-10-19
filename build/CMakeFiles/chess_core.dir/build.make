@@ -191,6 +191,21 @@ CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.s"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\gusta\Desktop\Chess\src\gen\ch_legalize.cpp -o CMakeFiles\chess_core.dir\src\gen\ch_legalize.cpp.s
 
+CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj: CMakeFiles/chess_core.dir/flags.make
+CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj: CMakeFiles/chess_core.dir/includes_CXX.rsp
+CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj: C:/Users/gusta/Desktop/Chess/src/gen/ch_movegen.cpp
+CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj: CMakeFiles/chess_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\gusta\Desktop\Chess\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj -MF CMakeFiles\chess_core.dir\src\gen\ch_movegen.cpp.obj.d -o CMakeFiles\chess_core.dir\src\gen\ch_movegen.cpp.obj -c C:\Users\gusta\Desktop\Chess\src\gen\ch_movegen.cpp
+
+CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\gusta\Desktop\Chess\src\gen\ch_movegen.cpp > CMakeFiles\chess_core.dir\src\gen\ch_movegen.cpp.i
+
+CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\gusta\Desktop\Chess\src\gen\ch_movegen.cpp -o CMakeFiles\chess_core.dir\src\gen\ch_movegen.cpp.s
+
 # Object files for target chess_core
 chess_core_OBJECTS = \
 "CMakeFiles/chess_core.dir/src/core/ch_bitboard.cpp.obj" \
@@ -200,7 +215,8 @@ chess_core_OBJECTS = \
 "CMakeFiles/chess_core.dir/src/analysis/ch_pins.cpp.obj" \
 "CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj" \
 "CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj" \
-"CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj"
+"CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj" \
+"CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj"
 
 # External object files for target chess_core
 chess_core_EXTERNAL_OBJECTS =
@@ -213,9 +229,10 @@ libchess_core.a: CMakeFiles/chess_core.dir/src/analysis/ch_pins.cpp.obj
 libchess_core.a: CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj
 libchess_core.a: CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj
 libchess_core.a: CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj
+libchess_core.a: CMakeFiles/chess_core.dir/src/gen/ch_movegen.cpp.obj
 libchess_core.a: CMakeFiles/chess_core.dir/build.make
 libchess_core.a: CMakeFiles/chess_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\gusta\Desktop\Chess\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX static library libchess_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\gusta\Desktop\Chess\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Linking CXX static library libchess_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles\chess_core.dir\cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\chess_core.dir\link.txt --verbose=$(VERBOSE)
 
