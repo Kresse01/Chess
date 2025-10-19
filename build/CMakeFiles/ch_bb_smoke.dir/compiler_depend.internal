@@ -4,12 +4,15 @@
 CMakeFiles/ch_bb_smoke.dir/tests/ch_pins_king_legal.cpp.obj
  C:/Users/gusta/Desktop/Chess/tests/ch_pins_king_legal.cpp
  C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_attack.h
+ C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_legality.h
  C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_pins.h
  C:/Users/gusta/Desktop/Chess/include/chess/core/ch_bitboard.h
  C:/Users/gusta/Desktop/Chess/include/chess/core/ch_board.h
  C:/Users/gusta/Desktop/Chess/include/chess/core/ch_square.h
  C:/Users/gusta/Desktop/Chess/include/chess/core/ch_types.h
  C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_king_legal.h
+ C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legal_masks.h
+ C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legalize.h
  C:/Users/gusta/Desktop/Chess/include/chess/pieces/ch_piece.h
  C:/msys64/mingw64/include/_mingw.h
  C:/msys64/mingw64/include/_mingw_mac.h

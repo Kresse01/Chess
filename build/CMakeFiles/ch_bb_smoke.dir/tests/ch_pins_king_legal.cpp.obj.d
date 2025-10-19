@@ -17,10 +17,13 @@ CMakeFiles/ch_bb_smoke.dir/tests/ch_pins_king_legal.cpp.obj: \
  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stddef.h \
  C:/msys64/mingw64/include/stddef.h \
  C:/Users/gusta/Desktop/Chess/include/chess/core/ch_bitboard.h \
- C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_pins.h \
- C:/Users/gusta/Desktop/Chess/include/chess/pieces/ch_piece.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legal_masks.h \
  C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_king_legal.h \
  C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_attack.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/pieces/ch_piece.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legalize.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_pins.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_legality.h \
  C:/Users/gusta/Desktop/Chess/include/chess/core/ch_square.h \
  C:/msys64/mingw64/include/c++/15.2.0/cctype \
  C:/msys64/mingw64/include/ctype.h \

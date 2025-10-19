@@ -178,6 +178,30 @@ src/analysis/ch_attack.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/analysis/ch_attack.cpp.s
 .PHONY : src/analysis/ch_attack.cpp.s
 
+src/analysis/ch_legality.obj: src/analysis/ch_legality.cpp.obj
+.PHONY : src/analysis/ch_legality.obj
+
+# target to build an object file
+src/analysis/ch_legality.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj
+.PHONY : src/analysis/ch_legality.cpp.obj
+
+src/analysis/ch_legality.i: src/analysis/ch_legality.cpp.i
+.PHONY : src/analysis/ch_legality.i
+
+# target to preprocess a source file
+src/analysis/ch_legality.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.i
+.PHONY : src/analysis/ch_legality.cpp.i
+
+src/analysis/ch_legality.s: src/analysis/ch_legality.cpp.s
+.PHONY : src/analysis/ch_legality.s
+
+# target to generate assembly for a file
+src/analysis/ch_legality.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.s
+.PHONY : src/analysis/ch_legality.cpp.s
+
 src/analysis/ch_pins.obj: src/analysis/ch_pins.cpp.obj
 .PHONY : src/analysis/ch_pins.obj
 
@@ -250,6 +274,54 @@ src/core/ch_board.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/core/ch_board.cpp.s
 .PHONY : src/core/ch_board.cpp.s
 
+src/gen/ch_legal_masks.obj: src/gen/ch_legal_masks.cpp.obj
+.PHONY : src/gen/ch_legal_masks.obj
+
+# target to build an object file
+src/gen/ch_legal_masks.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj
+.PHONY : src/gen/ch_legal_masks.cpp.obj
+
+src/gen/ch_legal_masks.i: src/gen/ch_legal_masks.cpp.i
+.PHONY : src/gen/ch_legal_masks.i
+
+# target to preprocess a source file
+src/gen/ch_legal_masks.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.i
+.PHONY : src/gen/ch_legal_masks.cpp.i
+
+src/gen/ch_legal_masks.s: src/gen/ch_legal_masks.cpp.s
+.PHONY : src/gen/ch_legal_masks.s
+
+# target to generate assembly for a file
+src/gen/ch_legal_masks.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.s
+.PHONY : src/gen/ch_legal_masks.cpp.s
+
+src/gen/ch_legalize.obj: src/gen/ch_legalize.cpp.obj
+.PHONY : src/gen/ch_legalize.obj
+
+# target to build an object file
+src/gen/ch_legalize.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj
+.PHONY : src/gen/ch_legalize.cpp.obj
+
+src/gen/ch_legalize.i: src/gen/ch_legalize.cpp.i
+.PHONY : src/gen/ch_legalize.i
+
+# target to preprocess a source file
+src/gen/ch_legalize.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.i
+.PHONY : src/gen/ch_legalize.cpp.i
+
+src/gen/ch_legalize.s: src/gen/ch_legalize.cpp.s
+.PHONY : src/gen/ch_legalize.s
+
+# target to generate assembly for a file
+src/gen/ch_legalize.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\chess_core.dir\build.make CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.s
+.PHONY : src/gen/ch_legalize.cpp.s
+
 src/pieces/ch_piece.obj: src/pieces/ch_piece.cpp.obj
 .PHONY : src/pieces/ch_piece.obj
 
@@ -312,6 +384,9 @@ help:
 	@echo ... src/analysis/ch_attack.obj
 	@echo ... src/analysis/ch_attack.i
 	@echo ... src/analysis/ch_attack.s
+	@echo ... src/analysis/ch_legality.obj
+	@echo ... src/analysis/ch_legality.i
+	@echo ... src/analysis/ch_legality.s
 	@echo ... src/analysis/ch_pins.obj
 	@echo ... src/analysis/ch_pins.i
 	@echo ... src/analysis/ch_pins.s
@@ -321,6 +396,12 @@ help:
 	@echo ... src/core/ch_board.obj
 	@echo ... src/core/ch_board.i
 	@echo ... src/core/ch_board.s
+	@echo ... src/gen/ch_legal_masks.obj
+	@echo ... src/gen/ch_legal_masks.i
+	@echo ... src/gen/ch_legal_masks.s
+	@echo ... src/gen/ch_legalize.obj
+	@echo ... src/gen/ch_legalize.i
+	@echo ... src/gen/ch_legalize.s
 	@echo ... src/pieces/ch_piece.obj
 	@echo ... src/pieces/ch_piece.i
 	@echo ... src/pieces/ch_piece.s

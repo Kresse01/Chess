@@ -3,12 +3,15 @@
 
 CMakeFiles/ch_bb_smoke.dir/tests/ch_pins_king_legal.cpp.obj: C:/Users/gusta/Desktop/Chess/tests/ch_pins_king_legal.cpp \
   C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_attack.h \
+  C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_legality.h \
   C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_pins.h \
   C:/Users/gusta/Desktop/Chess/include/chess/core/ch_bitboard.h \
   C:/Users/gusta/Desktop/Chess/include/chess/core/ch_board.h \
   C:/Users/gusta/Desktop/Chess/include/chess/core/ch_square.h \
   C:/Users/gusta/Desktop/Chess/include/chess/core/ch_types.h \
   C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_king_legal.h \
+  C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legal_masks.h \
+  C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legalize.h \
   C:/Users/gusta/Desktop/Chess/include/chess/pieces/ch_piece.h \
   C:/msys64/mingw64/include/_mingw.h \
   C:/msys64/mingw64/include/_mingw_mac.h \
@@ -231,39 +234,27 @@ C:/msys64/mingw64/include/corecrt_startup.h:
 
 C:/msys64/mingw64/include/corecrt.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/range_access.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/predefined_ops.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/char_traits.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/postypes.h:
-
-C:/msys64/mingw64/include/_mingw_off_t.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/basic_string.h:
+C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h:
 
 C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mm_malloc.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h:
+C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/predefined_ops.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/char_traits.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/postypes.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/basic_string.h:
+
+C:/msys64/mingw64/include/_mingw_off_t.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/bits/ostream_insert.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/ostream.tcc:
-
-C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/ctype_base.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/streambuf.tcc:
-
 C:/msys64/mingw64/include/c++/15.2.0/bits/max_size_type.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/ptr_traits.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/stl_function.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/bits/locale_classes.tcc:
 
@@ -277,35 +268,23 @@ C:/msys64/mingw64/include/stdlib.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/bits/exception_defines.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/exception.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/ext/type_traits.h:
-
 C:/msys64/mingw64/include/c++/15.2.0/bits/functional_hash.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/bits/cxxabi_init_exception.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/cstddef:
 
-C:/msys64/mingw64/include/c++/15.2.0/ext/string_conversions.h:
+C:/msys64/mingw64/include/c++/15.2.0/bits/cpp_type_traits.h:
 
-C:/msys64/mingw64/include/_mingw_mac.h:
+C:/msys64/mingw64/include/c++/15.2.0/bits/stl_algobase.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/iosfwd:
+C:/msys64/mingw64/include/c++/15.2.0/bits/ostream.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/exception_ptr.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/concept_check.h:
 
 C:/Users/gusta/Desktop/Chess/include/chess/pieces/ch_piece.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/cstdio:
-
-C:/msys64/mingw64/include/c++/15.2.0/string_view:
-
-C:/msys64/mingw64/include/wctype.h:
-
-C:/msys64/mingw64/include/wchar.h:
-
-C:/msys64/mingw64/include/swprintf.inl:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/new_allocator.h:
 
 C:/msys64/mingw64/include/corecrt_wstdlib.h:
 
@@ -323,7 +302,25 @@ C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/os_defines.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/ext/numeric_traits.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bit:
+C:/msys64/mingw64/include/c++/15.2.0/bits/ostream.tcc:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/streambuf.tcc:
+
+C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legalize.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/exception.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/ext/type_traits.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/ctype_base.h:
+
+C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_legality.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/utility.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/istream.tcc:
+
+C:/msys64/mingw64/include/c++/15.2.0/iosfwd:
 
 C:/msys64/mingw64/include/c++/15.2.0/bits/charconv.h:
 
@@ -333,35 +330,13 @@ C:/msys64/mingw64/include/c++/15.2.0/ostream:
 
 C:/Users/gusta/Desktop/Chess/tests/ch_pins_king_legal.cpp:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/ostream.h:
+C:/msys64/mingw64/include/c++/15.2.0/bit:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/exception_ptr.h:
+C:/msys64/mingw64/include/c++/15.2.0/ext/string_conversions.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/concept_check.h:
+C:/msys64/mingw64/include/_mingw_mac.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/cpp_type_traits.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/stl_algobase.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/istream.tcc:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/utility.h:
-
-C:/Users/gusta/Desktop/Chess/include/chess/core/ch_square.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/clocale:
-
-C:/msys64/mingw64/include/c++/15.2.0/exception:
-
-C:/msys64/mingw64/include/_mingw_stat64.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/basic_ios.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/compare:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/locale_facets.h:
-
-C:/msys64/mingw64/include/_timeval.h:
+C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legal_masks.h:
 
 C:/msys64/mingw64/include/assert.h:
 
@@ -371,6 +346,44 @@ C:/msys64/mingw64/include/c++/15.2.0/bits/locale_facets.tcc:
 
 C:/msys64/mingw64/include/c++/15.2.0/cwctype:
 
+C:/msys64/mingw64/include/wctype.h:
+
+C:/msys64/mingw64/include/wchar.h:
+
+C:/msys64/mingw64/include/swprintf.inl:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/new_allocator.h:
+
+C:/msys64/mingw64/include/crtdefs.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/iterator_concepts.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/cxxabi_forced.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/basic_string.tcc:
+
+C:/Users/gusta/Desktop/Chess/include/chess/core/ch_square.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/clocale:
+
+C:/msys64/mingw64/include/c++/15.2.0/exception:
+
+C:/msys64/mingw64/include/_mingw_stat64.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/stdexcept:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/basic_ios.tcc:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/ranges_util.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/basic_ios.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/compare:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/locale_facets.h:
+
+C:/msys64/mingw64/include/_timeval.h:
+
 C:/msys64/mingw64/include/c++/15.2.0/bits/allocator.h:
 
 C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_pins.h:
@@ -379,19 +392,15 @@ C:/msys64/mingw64/include/_mingw_secapi.h:
 
 C:/Users/gusta/Desktop/Chess/include/chess/core/ch_board.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/stdexcept:
+C:/msys64/mingw64/include/c++/15.2.0/bits/ptr_traits.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/ranges_util.h:
+C:/msys64/mingw64/include/c++/15.2.0/bits/stl_function.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/basic_ios.tcc:
+C:/msys64/mingw64/include/c++/15.2.0/string_view:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/cxxabi_forced.h:
+C:/msys64/mingw64/include/c++/15.2.0/cstdio:
 
-C:/msys64/mingw64/include/crtdefs.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/iterator_concepts.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/basic_string.tcc:
+C:/msys64/mingw64/include/c++/15.2.0/bits/range_access.h:
 
 C:/msys64/mingw64/include/sys/types.h:
 
@@ -404,6 +413,10 @@ C:/msys64/mingw64/include/c++/15.2.0/bits/ranges_cmp.h:
 C:/msys64/mingw64/include/c++/15.2.0/debug/assertions.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/istream:
+
+C:/msys64/mingw64/include/c++/15.2.0/system_error:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/refwrap.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++config.h:
 
@@ -443,15 +456,15 @@ C:/msys64/mingw64/include/c++/15.2.0/bits/uses_allocator.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/bits/uses_allocator_args.h:
 
-C:/msys64/mingw64/include/c++/15.2.0/bits/memory_resource.h:
-
 C:/msys64/mingw64/include/c++/15.2.0/bits/localefwd.h:
+
+C:/msys64/mingw64/include/c++/15.2.0/bits/memory_resource.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/bits/version.h:
 
-C:/Users/gusta/Desktop/Chess/include/chess/core/ch_bitboard.h:
-
 C:/msys64/mingw64/include/c++/15.2.0/iostream:
+
+C:/Users/gusta/Desktop/Chess/include/chess/core/ch_bitboard.h:
 
 C:/msys64/mingw64/include/c++/15.2.0/cerrno:
 
@@ -480,10 +493,6 @@ C:/msys64/mingw64/include/c++/15.2.0/stdlib.h:
 C:/msys64/mingw64/include/c++/15.2.0/streambuf:
 
 C:/msys64/mingw64/include/c++/15.2.0/string:
-
-C:/msys64/mingw64/include/c++/15.2.0/bits/refwrap.h:
-
-C:/msys64/mingw64/include/c++/15.2.0/system_error:
 
 C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_attack.h:
 

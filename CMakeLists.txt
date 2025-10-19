@@ -20,7 +20,10 @@ add_library(chess_core
     src/core/ch_board.cpp
     src/pieces/ch_piece.cpp
     src/analysis/ch_attack.cpp
-    src/analysis/ch_pins.cpp)
+    src/analysis/ch_pins.cpp
+    src/analysis/ch_legality.cpp
+    src/gen/ch_legal_masks.cpp
+    src/gen/ch_legalize.cpp)
 target_include_directories(chess_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Warnings

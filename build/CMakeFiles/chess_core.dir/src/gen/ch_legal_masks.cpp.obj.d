@@ -1,6 +1,10 @@
-CMakeFiles/ch_bb_smoke.dir/tests/ch_test_bitboard.cpp.obj: \
- C:\Users\gusta\Desktop\Chess\tests\ch_test_bitboard.cpp \
- C:/Users/gusta/Desktop/Chess/include/chess/core/ch_bitboard.h \
+CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj: \
+ C:\Users\gusta\Desktop\Chess\src\gen\ch_legal_masks.cpp \
+ C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legal_masks.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_king_legal.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_attack.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/core/ch_board.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/core/ch_types.h \
  C:/msys64/mingw64/include/c++/15.2.0/cstdint \
  C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++config.h \
  C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/os_defines.h \
@@ -15,27 +19,17 @@ CMakeFiles/ch_bb_smoke.dir/tests/ch_test_bitboard.cpp.obj: \
  C:/msys64/mingw64/include/sdks/_mingw_ddk.h \
  C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stddef.h \
  C:/msys64/mingw64/include/stddef.h \
- C:/Users/gusta/Desktop/Chess/include/chess/core/ch_types.h \
- C:/Users/gusta/Desktop/Chess/include/chess/core/ch_board.h \
- C:/Users/gusta/Desktop/Chess/include/chess/core/ch_square.h \
- C:/msys64/mingw64/include/c++/15.2.0/cctype \
- C:/msys64/mingw64/include/ctype.h \
- C:/msys64/mingw64/include/corecrt_wctype.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/core/ch_bitboard.h \
  C:/Users/gusta/Desktop/Chess/include/chess/pieces/ch_piece.h \
- C:/msys64/mingw64/include/c++/15.2.0/cassert \
- C:/msys64/mingw64/include/assert.h \
- C:/msys64/mingw64/include/c++/15.2.0/stdlib.h \
- C:/msys64/mingw64/include/c++/15.2.0/cstdlib \
- C:/msys64/mingw64/include/stdlib.h \
- C:/msys64/mingw64/include/corecrt_wstdlib.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/limits.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/syslimits.h \
- C:/msys64/mingw64/include/limits.h \
- C:/msys64/mingw64/include/sec_api/stdlib_s.h \
- C:/msys64/mingw64/include/malloc.h \
- C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mm_malloc.h \
- C:/msys64/mingw64/include/errno.h \
- C:/msys64/mingw64/include/c++/15.2.0/bits/std_abs.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/gen/ch_legalize.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_pins.h \
+ C:/Users/gusta/Desktop/Chess/include/chess/analysis/ch_legality.h \
+ C:/msys64/mingw64/include/c++/15.2.0/cstdio \
+ C:/msys64/mingw64/include/stdio.h \
+ C:/msys64/mingw64/include/corecrt_stdio_config.h \
+ C:/msys64/mingw64/include/_mingw_off_t.h \
+ C:/msys64/mingw64/include/swprintf.inl \
+ C:/msys64/mingw64/include/sec_api/stdio_s.h \
  C:/msys64/mingw64/include/c++/15.2.0/iostream \
  C:/msys64/mingw64/include/c++/15.2.0/bits/requires_hosted.h \
  C:/msys64/mingw64/include/c++/15.2.0/ostream \
@@ -47,10 +41,9 @@ CMakeFiles/ch_bb_smoke.dir/tests/ch_test_bitboard.cpp.obj: \
  C:/msys64/mingw64/include/c++/15.2.0/bits/postypes.h \
  C:/msys64/mingw64/include/c++/15.2.0/cwchar \
  C:/msys64/mingw64/include/wchar.h \
- C:/msys64/mingw64/include/corecrt_stdio_config.h \
- C:/msys64/mingw64/include/_mingw_off_t.h \
+ C:/msys64/mingw64/include/corecrt_wstdlib.h \
+ C:/msys64/mingw64/include/corecrt_wctype.h \
  C:/msys64/mingw64/include/_mingw_stat64.h \
- C:/msys64/mingw64/include/swprintf.inl \
  C:/msys64/mingw64/include/sec_api/wchar_s.h \
  C:/msys64/mingw64/include/c++/15.2.0/exception \
  C:/msys64/mingw64/include/c++/15.2.0/bits/exception.h \
@@ -78,17 +71,20 @@ CMakeFiles/ch_bb_smoke.dir/tests/ch_test_bitboard.cpp.obj: \
  C:/msys64/mingw64/include/c++/15.2.0/bits/localefwd.h \
  C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++locale.h \
  C:/msys64/mingw64/include/c++/15.2.0/clocale \
- C:/msys64/mingw64/include/locale.h C:/msys64/mingw64/include/stdio.h \
- C:/msys64/mingw64/include/sec_api/stdio_s.h \
+ C:/msys64/mingw64/include/locale.h \
+ C:/msys64/mingw64/include/c++/15.2.0/cctype \
+ C:/msys64/mingw64/include/ctype.h \
  C:/msys64/mingw64/include/c++/15.2.0/bits/ios_base.h \
  C:/msys64/mingw64/include/c++/15.2.0/ext/atomicity.h \
  C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
  C:/msys64/mingw64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
- C:/msys64/mingw64/include/pthread.h \
+ C:/msys64/mingw64/include/pthread.h C:/msys64/mingw64/include/errno.h \
  C:/msys64/mingw64/include/sys/types.h \
  C:/msys64/mingw64/include/process.h \
  C:/msys64/mingw64/include/corecrt_startup.h \
- C:/msys64/mingw64/include/signal.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/limits.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/syslimits.h \
+ C:/msys64/mingw64/include/limits.h C:/msys64/mingw64/include/signal.h \
  C:/msys64/mingw64/include/pthread_signal.h \
  C:/msys64/mingw64/include/time.h C:/msys64/mingw64/include/sys/timeb.h \
  C:/msys64/mingw64/include/sec_api/sys/timeb_s.h \
@@ -132,7 +128,13 @@ CMakeFiles/ch_bb_smoke.dir/tests/ch_test_bitboard.cpp.obj: \
  C:/msys64/mingw64/include/c++/15.2.0/numbers \
  C:/msys64/mingw64/include/c++/15.2.0/bits/string_view.tcc \
  C:/msys64/mingw64/include/c++/15.2.0/ext/string_conversions.h \
- C:/msys64/mingw64/include/c++/15.2.0/cstdio \
+ C:/msys64/mingw64/include/c++/15.2.0/cstdlib \
+ C:/msys64/mingw64/include/stdlib.h \
+ C:/msys64/mingw64/include/sec_api/stdlib_s.h \
+ C:/msys64/mingw64/include/c++/15.2.0/stdlib.h \
+ C:/msys64/mingw64/include/malloc.h \
+ C:/msys64/mingw64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mm_malloc.h \
+ C:/msys64/mingw64/include/c++/15.2.0/bits/std_abs.h \
  C:/msys64/mingw64/include/c++/15.2.0/cerrno \
  C:/msys64/mingw64/include/c++/15.2.0/bits/charconv.h \
  C:/msys64/mingw64/include/c++/15.2.0/bits/basic_string.tcc \

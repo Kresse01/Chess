@@ -146,13 +146,61 @@ CMakeFiles/chess_core.dir/src/analysis/ch_pins.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/chess_core.dir/src/analysis/ch_pins.cpp.s"
 	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\gusta\Desktop\Chess\src\analysis\ch_pins.cpp -o CMakeFiles\chess_core.dir\src\analysis\ch_pins.cpp.s
 
+CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj: CMakeFiles/chess_core.dir/flags.make
+CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj: CMakeFiles/chess_core.dir/includes_CXX.rsp
+CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj: C:/Users/gusta/Desktop/Chess/src/analysis/ch_legality.cpp
+CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj: CMakeFiles/chess_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\gusta\Desktop\Chess\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj -MF CMakeFiles\chess_core.dir\src\analysis\ch_legality.cpp.obj.d -o CMakeFiles\chess_core.dir\src\analysis\ch_legality.cpp.obj -c C:\Users\gusta\Desktop\Chess\src\analysis\ch_legality.cpp
+
+CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\gusta\Desktop\Chess\src\analysis\ch_legality.cpp > CMakeFiles\chess_core.dir\src\analysis\ch_legality.cpp.i
+
+CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\gusta\Desktop\Chess\src\analysis\ch_legality.cpp -o CMakeFiles\chess_core.dir\src\analysis\ch_legality.cpp.s
+
+CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj: CMakeFiles/chess_core.dir/flags.make
+CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj: CMakeFiles/chess_core.dir/includes_CXX.rsp
+CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj: C:/Users/gusta/Desktop/Chess/src/gen/ch_legal_masks.cpp
+CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj: CMakeFiles/chess_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\gusta\Desktop\Chess\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj -MF CMakeFiles\chess_core.dir\src\gen\ch_legal_masks.cpp.obj.d -o CMakeFiles\chess_core.dir\src\gen\ch_legal_masks.cpp.obj -c C:\Users\gusta\Desktop\Chess\src\gen\ch_legal_masks.cpp
+
+CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\gusta\Desktop\Chess\src\gen\ch_legal_masks.cpp > CMakeFiles\chess_core.dir\src\gen\ch_legal_masks.cpp.i
+
+CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\gusta\Desktop\Chess\src\gen\ch_legal_masks.cpp -o CMakeFiles\chess_core.dir\src\gen\ch_legal_masks.cpp.s
+
+CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj: CMakeFiles/chess_core.dir/flags.make
+CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj: CMakeFiles/chess_core.dir/includes_CXX.rsp
+CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj: C:/Users/gusta/Desktop/Chess/src/gen/ch_legalize.cpp
+CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj: CMakeFiles/chess_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=C:\Users\gusta\Desktop\Chess\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj -MF CMakeFiles\chess_core.dir\src\gen\ch_legalize.cpp.obj.d -o CMakeFiles\chess_core.dir\src\gen\ch_legalize.cpp.obj -c C:\Users\gusta\Desktop\Chess\src\gen\ch_legalize.cpp
+
+CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.i"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E C:\Users\gusta\Desktop\Chess\src\gen\ch_legalize.cpp > CMakeFiles\chess_core.dir\src\gen\ch_legalize.cpp.i
+
+CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.s"
+	C:\msys64\mingw64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S C:\Users\gusta\Desktop\Chess\src\gen\ch_legalize.cpp -o CMakeFiles\chess_core.dir\src\gen\ch_legalize.cpp.s
+
 # Object files for target chess_core
 chess_core_OBJECTS = \
 "CMakeFiles/chess_core.dir/src/core/ch_bitboard.cpp.obj" \
 "CMakeFiles/chess_core.dir/src/core/ch_board.cpp.obj" \
 "CMakeFiles/chess_core.dir/src/pieces/ch_piece.cpp.obj" \
 "CMakeFiles/chess_core.dir/src/analysis/ch_attack.cpp.obj" \
-"CMakeFiles/chess_core.dir/src/analysis/ch_pins.cpp.obj"
+"CMakeFiles/chess_core.dir/src/analysis/ch_pins.cpp.obj" \
+"CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj" \
+"CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj" \
+"CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj"
 
 # External object files for target chess_core
 chess_core_EXTERNAL_OBJECTS =
@@ -162,9 +210,12 @@ libchess_core.a: CMakeFiles/chess_core.dir/src/core/ch_board.cpp.obj
 libchess_core.a: CMakeFiles/chess_core.dir/src/pieces/ch_piece.cpp.obj
 libchess_core.a: CMakeFiles/chess_core.dir/src/analysis/ch_attack.cpp.obj
 libchess_core.a: CMakeFiles/chess_core.dir/src/analysis/ch_pins.cpp.obj
+libchess_core.a: CMakeFiles/chess_core.dir/src/analysis/ch_legality.cpp.obj
+libchess_core.a: CMakeFiles/chess_core.dir/src/gen/ch_legal_masks.cpp.obj
+libchess_core.a: CMakeFiles/chess_core.dir/src/gen/ch_legalize.cpp.obj
 libchess_core.a: CMakeFiles/chess_core.dir/build.make
 libchess_core.a: CMakeFiles/chess_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\gusta\Desktop\Chess\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX static library libchess_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=C:\Users\gusta\Desktop\Chess\build\CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX static library libchess_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles\chess_core.dir\cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\chess_core.dir\link.txt --verbose=$(VERBOSE)
 
