@@ -29,7 +29,7 @@ namespace ch
      * We seperate PieceKind from Color so that (Kind, Color) forms the concrete type.
      * Use PieceKind to select movement rules; combine with Color to query occupancy.
      */
-    enum class PieceKind : uint8_t{Pawn = 0, Knight = 1, Bishop = 2, Rook = 3, Queen = 4, King = 5};
+    enum class PieceKind : uint8_t{Pawn = 0, Knight = 1, Bishop = 2, Rook = 3, Queen = 4, King = 5, None = 255};
 
     /**
      * @brief Utility: return the opposite color.

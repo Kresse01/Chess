@@ -68,41 +68,41 @@ namespace ch
         * These are declared for completeness; you may implement when needed.
         * @{
         */
-       void set_ep_target(int sq) {ep_sq_ = sq; }
-       void set_castle(Color c, bool kside, bool value) { castle_[int(c)][kside?0:1] = value; }
-       void set_side_to_move(Color c){ stm_ = c; }
-       void set_piece(Color c, PieceKind k, int sq)
-       {
-        bb_[int(c)][int(k)] |= bit(sq); rebuild_occ();
-       }
-       void clear_piece(Color c, PieceKind k, int sq)
-       {
-        bb_[int(c)][int(k)] &= ~bit(sq); rebuild_occ();
-       }
-       /** @} */
+        void set_ep_target(int sq) {ep_sq_ = sq; }
+        void set_castle(Color c, bool kside, bool value) { castle_[int(c)][kside?0:1] = value; }
+        void set_side_to_move(Color c){ stm_ = c; }
+        void set_piece(Color c, PieceKind k, int sq)
+        {
+         bb_[int(c)][int(k)] |= bit(sq); rebuild_occ();
+        }
+        void clear_piece(Color c, PieceKind k, int sq)
+        {
+         bb_[int(c)][int(k)] &= ~bit(sq); rebuild_occ();
+        }
+        /** @} */
 
-       uint16_t halfmove_clock() const { return halfmove_clock_; }
-       void set_halfmove_clock(uint16_t v) { halfmove_clock_ = v; }
+        uint16_t halfmove_clock() const { return halfmove_clock_; }
+        void set_halfmove_clock(uint16_t v) { halfmove_clock_ = v; }
 
-       uint32_t fullmove_number() const { return fullmove_number_; }
-       void set_fullmove_number(uint32_t v) { fullmove_number_ = v; }
+        uint32_t fullmove_number() const { return fullmove_number_; }
+        void set_fullmove_number(uint32_t v) { fullmove_number_ = v; }
 
-       uint8_t castle_rights_mask() const
-       {
-        uint8_t m = 0;
-        if (castle_[0][0]) m |= 1u; // WK
-        if (castle_[0][1]) m |= 1u<<1; // WQ
-        if (castle_[1][0]) m |= 1u<<2; // BK
-        if (castle_[1][1]) m |= 1u<<3; // BQ
-        return m;
-       }
+        uint8_t castle_rights_mask() const
+        {
+         uint8_t m = 0;
+         if (castle_[0][0]) m |= 1u; // WK
+         if (castle_[0][1]) m |= 1u<<1; // WQ
+         if (castle_[1][0]) m |= 1u<<2; // BK
+         if (castle_[1][1]) m |= 1u<<3; // BQ
+         return m;
+        }
 
-       // --- Generic square mutators (color-agnostic)
-       void clear_square(int sq); // remove any piece on sq (if any)
+        // --- Generic square mutators (color-agnostic)
+        void clear_square(int sq); // remove any piece on sq (if any)
        
-       // -- Convenience queries
-       bool occupied(int sq) const { return (occ_all_ & bit(sq)) != 0; }
-       bool occupied_by(int sq, Color c) const { return (occ_[int(c)] & bit(sq)) != 0; }
+        // -- Convenience queries
+        bool occupied(int sq) const { return (occ_all_ & bit(sq)) != 0; }
+        bool occupied_by(int sq, Color c) const { return (occ_[int(c)] & bit(sq)) != 0; }
     
     private:
         BB bb_[2][6]{};         ///< per-(color,kind) bitboards
