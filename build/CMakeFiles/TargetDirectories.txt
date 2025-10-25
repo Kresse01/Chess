@@ -1,5 +1,0 @@
-C:/Users/gusta/Desktop/Chess/build/CMakeFiles/chess_core.dir
-C:/Users/gusta/Desktop/Chess/build/CMakeFiles/ch_bb_smoke.dir
-C:/Users/gusta/Desktop/Chess/build/CMakeFiles/run_bb_smoke.dir
-C:/Users/gusta/Desktop/Chess/build/CMakeFiles/edit_cache.dir
-C:/Users/gusta/Desktop/Chess/build/CMakeFiles/rebuild_cache.dir
