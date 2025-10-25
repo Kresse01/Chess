@@ -18,13 +18,15 @@ option(CH_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 add_library(chess_core
     src/core/ch_bitboard.cpp
     src/core/ch_board.cpp
+    src/core/ch_state.cpp
     src/pieces/ch_piece.cpp
     src/analysis/ch_attack.cpp
     src/analysis/ch_pins.cpp
     src/analysis/ch_legality.cpp
     src/gen/ch_legal_masks.cpp
     src/gen/ch_legalize.cpp
-    src/gen/ch_movegen.cpp)
+    src/gen/ch_movegen.cpp
+    src/gen/ch_king_legal.cpp)
 target_include_directories(chess_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 # Warnings
@@ -40,6 +42,20 @@ endif()
 # ---- Smoke test executable ---
 add_executable(ch_bb_smoke tests/ch_pins_king_legal.cpp)
 target_link_libraries(ch_bb_smoke PRIVATE chess_core)
+
+# --- GUI Build ---
+find_package(SFML 3 CONFIG REQUIRED COMPONENTS Graphics Window System)
+
+add_executable(chess_gui gui/chess_gui.cpp)
+
+target_include_directories(chess_gui PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+target_link_libraries(chess_gui PRIVATE
+    chess_core
+    SFML::Graphics
+    SFML::Window
+    SFML::System)
+target_compile_features(chess_gui PRIVATE cxx_std_20)
 
 # A handy target to run the smoke test from your build
 add_custom_target(run_bb_smoke

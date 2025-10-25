@@ -17,6 +17,7 @@
 
 #include "ch_types.h"
 #include "ch_bitboard.h"
+#include <string>
 
 namespace ch
 {

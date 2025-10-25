@@ -1,283 +1,264 @@
 #include <SFML/Graphics.hpp>
-#include <algorithm>
-#include <optional>
 #include <vector>
-#include <cmath>
-#include <array>
+#include <optional>
+#include <algorithm>
 #include <string>
 #include <cassert>
+#include <cctype>
 
-// Helpers for coordinates and visuals
-struct BoardTheme
-{
-    sf::Color ligh{240, 217, 181};
-    sf::Color dark{181, 136, 99};
-    sf::Color highlight{255, 255, 0, 120};
-    sf::Color moveDot{50, 50, 50, 160};
-    sf::Color lastMove{100, 200, 100, 120};
-    sf::Color check{255, 100, 100, 140};
+#include "chess/core/ch_board.h"
+#include "chess/core/ch_move.h"
+#include "chess/core/ch_state.h"
+#include "chess/gen/ch_movegen.h"
+#include "chess/core/ch_types.h"
+
+namespace {
+
+struct Theme {
+    sf::Color light{240,217,181}, dark{181,136,99};
+    sf::Color last{120,200,120,120}, dot{50,50,50,160}, check{255,80,80,140};
 };
 
-static inline int sq_from_fr(int file, int rank) { return rank * 8 + file; }
-static inline int file_of(int sq) { return sq % 8; }
-static inline int rank_of(int sq) { return sq / 8; }
+inline int file_of(int s){ return s & 7; }
+inline int rank_of(int s){ return s >> 3; }
+inline int idx(int f, int r){ return (r<<3) | f; }
 
-// BoardView draws the board and pieces, and supports simple animation
-class BoardView
-{
+static bool piece_at(const ch::Board& b, int sq, ch::Color& outC, ch::PieceKind& outK) {
+    ch::BB mask = ch::bit(sq);
+    if (!(b.occ_all() & mask)) return false;
+    if (b.occ(ch::Color::White) & mask) {
+        outC = ch::Color::White;
+        for (int k=0;k<6;++k) if (b.bb(outC, ch::PieceKind(k)) & mask) { outK = ch::PieceKind(k); return true; }
+    } else {
+        outC = ch::Color::Black;
+        for (int k=0;k<6;++k) if (b.bb(outC, ch::PieceKind(k)) & mask) { outK = ch::PieceKind(k); return true; }
+    }
+    return false;
+}
+
+static const char* letter(ch::PieceKind k) {
+    switch (k) {
+        case ch::PieceKind::Pawn:   return "P";
+        case ch::PieceKind::Knight: return "N";
+        case ch::PieceKind::Bishop: return "B";
+        case ch::PieceKind::Rook:   return "R";
+        case ch::PieceKind::Queen:  return "Q";
+        case ch::PieceKind::King:   return "K";
+        default: return "?";
+    }
+}
+
+} // namespace
+
+// ---------------- BoardView ----------------
+class BoardView {
 public:
-    BoardView(float title = 96.f, float margin = 20.f)
-        : tileSize(tile), margin(margin), boardSize(8*tile) {}
+    BoardView(float tile=96.f, float margin=20.f) : tile(tile), margin(margin) {}
 
-    sf::vector2f squareTopLeft(int sq) const
-    {
-        return {margin + file_of(sq)*tileSize, margin+(7-rank_of(sq))*tileSize };
-        // Note: GUI draws rank 8 at top, If you want white at bottom, invert rank as above
+    int squareAt(sf::Vector2f p) const {
+        float x = p.x - margin, y = p.y - margin;
+        if (x < 0 || y < 0) return -1;
+        int f = int(x / tile), rtop = int(y / tile);
+        if (f < 0 || f > 7 || rtop < 0 || rtop > 7) return -1;
+        int r = 7 - rtop;
+        return idx(f,r);
     }
 
-    int squareAtPixel(sf::Vector2f p) const
-    {
-        float x = p.x -margin, y=p.y - margin;
-        if(x < 0 || y < 0) return -1;
-        int f = int(x/tileSize), r_from_top = int(y/tileSize);
-        if (f < 0 || f > 7 || r_from_top < 0 || r_from_top > 7) return -1;
-        int r = 7 - r_from_top; // invert
-        return sq_from_fr(f, r);
+    sf::Vector2f topLeft(int sq) const {
+        return { margin + float(file_of(sq))*tile, margin + float(7 - rank_of(sq))*tile };
     }
 
-    void drawBoard(sf::RenderWindow& win, const BoardTheme& theme,
-                   std::optional<std::pair<int,int>> lastMove = std::nullopt,
-                   std::optional<int> inCheckSq = std::nullopt) const
+    void drawBoard(sf::RenderWindow& w, const Theme& t,
+                   std::optional<std::pair<int,int>> lastMove = std::nullopt) const
     {
-        // Squares
-        for (int r = 0; r < 8; ++r)
-        {
-            for (int f = 0; f < 8; ++f)
-            {
-                int sq = sq_from_fr(f,r);
-                sf::RectangleShape rect({tileSize,tileSize});
-                rect.setPosition(squareTopLeft(sq));
-                bool dark = ((r+f)%2) != 0;
-                rect.setFillColor(dark ? theme.dark : theme.light);
-                win.draw(rect);
-            }
+        for (int r=0;r<8;++r) for (int f=0;f<8;++f) {
+            int sq = idx(f,r);
+            sf::RectangleShape s({tile,tile});
+            s.setPosition(topLeft(sq));
+            s.setFillColor(((r+f)&1) ? t.dark : t.light);
+            w.draw(s);
         }
-        // Last move highlight
-        if (lastMove)
-        {
-            for (int sq : { lastMove->first, lastMove->second })
-            {
-                sf::RectangleShape hl({tileSize, tileSize});
-                hl.setPosition(squareTopLeft(sq));
-                hl.setFillColor(theme.lastMove);
-                win.draw(hl);
-            }
-        }
-
-        // check square highlight
-        if (inCheckSq) {
-            sf::RectangleShape hl({tileSize,tileSize});
-            hl.setPosition(squareTopLeft(*inCheckSq));
-            hl.setFillColor(theme.check);
-            win.draw(hl);
-        }
-    }
-
-    void drawLegalMoves(sf::RenderWindow& win, const BoardTheme& theme,
-                        const std::vector<int>& targets) const
-    {
-        for (int sq : targets)
-        {
-            auto tl = squareTopLeft(sq);
-            sf::CircleShape dot(tileSize * 0.12f);
-            dot.setFillColor(theme.moveDot);
-            dot.setOrigin(dot.getRadius(), dot.getRadius());
-            dot.setPosition(tl.x + tileSize/2.f, tl.y + tileSize/2.f);
-            win.draw(dot);
-        }
-    }
-
-    // Very simple piece rendering: letters. Replace with sprites when you add artwork
-    void drawPieces(sf::RenderWindow& win, const ch::State& st, std::optional<int> draggingSq, sf::Vector2f dragPos) const
-    {
-        sf::Font font;
-        // Load a system font path if you like; here we use SFML default if available.
-        // For reliability, ship a font file in your repo and load it once.
-        static bool loaded = font.loadFromFile("DejaVuSans.ttf"); (void) loaded;
-        for (int sq = 0; sq < 64; ++sq)
-        {
-            if (draggingSq && *draggingSq == sq) continue; // draw dragged piece
-            auto p = st.piece_at(sq);
-            if (p.kind == ch::EMPTY) continue;
-            drawPieceAt(win, font, p, squareTopLeft(sq));
-        }
-
-        if (draggingSq)
-        {
-            auto p = st.piece_at(*draggingSq);
-            if (p.kind != chess::EMPTY)
-            {
-                sf::Vector2f topLeft = { dragPos.x - tileSize/2.f, dragPos.y - tileSize/2.f };
-                drawPieceAt(win, font, p, topLeft);
+        if (lastMove) {
+            for (int sq: {lastMove->first, lastMove->second}) {
+                sf::RectangleShape hl({tile,tile});
+                hl.setPosition(topLeft(sq));
+                hl.setFillColor(t.last);
+                w.draw(hl);
             }
         }
     }
 
-private:
-    void drawPieceAt(sf::RenderWindow& win, sf::Font& font,
-                     const ch::Piece& pc, sf::Vector2f topLeft) const
+    void drawLegalDots(sf::RenderWindow& w, const Theme& t,
+                       const std::vector<int>& targets) const
     {
-        sf::RectangleShape bg({tileSize, tileSize});
-        bg.setPosition(topLeft);
-        bg.setFillColor(sf::Color(0,0,0,0)); // transparent (kept for hitbox if needed)
-        win.draw(bg);
-
-        sf::Text t;
-        t.setFont(font);
-        t.setCharacterSize(static_cast<unsigned>(tileSize*0.7f));
-        t.setFillColor(pc.color == chess::White ? sf::Color::White : sf::Color::Black);
-        t.setOutlineThickness(2.f);
-        t.setOutlineColor(pc.color == chess::White ? sf::Color::Black : sf::Color::White);
-        t.setString(pieceLetter(pc));
-
-        // center in the square
-        st::FloatRect bounds = t.getLocalBounds();
-        t.setPosition(topLeft.x + (tileSize - bounds.width)/2.f - bounds.left,
-                      topLeft.y + (tileSize - bounds.height)/2.f - bounds.top);
-        win.draw(t);
-    }
-
-    sf::String pieceLetter(const ch::Piece& pc) const
-    {
-        switch(pc.kind)
-        {
-            case ch::PAWN: return "P";
-            case ch::KNIGHT: return "N";
-            case ch::BISHOP: return "B";
-            case ch::ROOK: return "R";
-            case ch::QUEEN: return "Q";
-            case ch::KING: return "K";
-            default: return "";
+        for (int sq : targets) {
+            sf::CircleShape c(tile*0.12f);
+            c.setOrigin(sf::Vector2f(c.getRadius(), c.getRadius()));
+            auto TL = topLeft(sq);
+            c.setPosition(sf::Vector2f(TL.x + tile/2.f, TL.y + tile/2.f));
+            c.setFillColor(t.dot);
+            w.draw(c);
         }
     }
-public:
-    float tileSize;
-    float margin;
-    float boardSize;
+
+    void drawPieces(sf::RenderWindow& w, const ch::Board& B,
+                    std::optional<int> dragging, sf::Vector2f dragPos) const
+    {
+        static sf::Font font; static bool loaded=false;
+        if (!loaded) loaded = font.openFromFile("C:/Users/gusta/Desktop/Chess/gui/DejaVuSans.ttf");
+
+        auto draw_one = [&](int sq, sf::Vector2f pos){
+            ch::Color c; ch::PieceKind k;
+            if (!piece_at(B, sq, c, k)) return;
+
+            // In SFML 3, provide font in constructor
+            sf::Text t(font, letter(k), unsigned(tile*0.7f));
+            bool white = (c == ch::Color::White);
+            t.setFillColor(white ? sf::Color::White : sf::Color::Black);
+            t.setOutlineThickness(2.f);
+            t.setOutlineColor(white ? sf::Color::Black : sf::Color::White);
+
+            // Center text inside tile using new bounds API: position + size
+            const auto lb = t.getLocalBounds();
+            const sf::Vector2f origin(lb.position.x + lb.size.x/2.f,
+                                      lb.position.y + lb.size.y/2.f);
+            t.setOrigin(origin);
+            t.setPosition(sf::Vector2f(pos.x + tile/2.f, pos.y + tile/2.f));
+
+            w.draw(t);
+        };
+
+        for (int sq=0; sq<64; ++sq) if (!(dragging && *dragging==sq)) {
+            draw_one(sq, topLeft(sq));
+        }
+        if (dragging) {
+            auto pos = sf::Vector2f(dragPos.x - tile/2.f, dragPos.y - tile/2.f);
+            draw_one(*dragging, pos);
+        }
+    }
+
+    float tile{96.f};
+    float margin{20.f};
 };
 
-// Controller: handles input, selection, generating legal moves, and committing engine moves
-class GuiController
-{
+// ---------------- Controller ----------------
+class Controller {
 public:
-    GuiController(ch::State& s, BoardView& v) : st(s), view(v) {}
-    
-    void handleEvent(const sf::Event& e, sf::RenderWindow& win)
-    {
-        if (e.type == sf::Event::MouseButtonPressed && e.mouseButton.button == sf::Mouse::Left)
-        {
-            onMouseDown(win);
-        } else if (e.type == sf::Event::MouseButtonReleased && e.mouseButton.button == sf::Mouse::Left) {
-            onMouseUp(win);
-        } else if (e.type == sf::Event::MouseMoved) {
-            mousePos = sf::Vector2f(static_cast<float>(e.mouseMove.x), static_cast<float>(e.mouseMove.y));
+    Controller(ch::Board& B) : board(B) {}
+
+    void handle(const sf::Event& e) {
+        if (const auto* mm = e.getIf<sf::Event::MouseMoved>()) {
+            mouse = sf::Vector2f(float(mm->position.x), float(mm->position.y));
+        } else if (const auto* mbp = e.getIf<sf::Event::MouseButtonPressed>()) {
+            if (mbp->button == sf::Mouse::Button::Left) onDown();
+        } else if (const auto* mbr = e.getIf<sf::Event::MouseButtonReleased>()) {
+            if (mbr->button == sf::Mouse::Button::Left) onUp();
+        } else if (const auto* kp = e.getIf<sf::Event::KeyPressed>()) {
+            if (kp->code == sf::Keyboard::Key::U) onUndo();
         }
     }
 
-    void draw(sf::RenderWindow& win)
-    {
-        std::optional<int> checkSq = std::nullopt; // you can compute if king in check
-        view.drawBoard(win, theme, lastMove, checkSq);
-
-        if (selectSq >= 0)
-        {
-            view.drawLegalMoves(win,theme,legalTargets);
-        }
-        view.drawPieces(win, st, dragging ? std::optional<int>(dragFromSq) : std::nullopt, mousePos);
+    void draw(sf::RenderWindow& w) {
+        view.drawBoard(w, theme, lastMove);
+        if (selected >= 0) view.drawLegalDots(w, theme, legalTargets);
+        view.drawPieces(w, board, dragging? std::optional<int>(dragFrom) : std::nullopt, mouse);
     }
+
+    void setFromFEN(const std::string& fen) {
+        board.set_fen(fen.c_str());
+        history.clear(); lastMove.reset(); played.clear();
+    }
+    std::string fen() const { return board.to_fen(); }
 
 private:
-    void onMouseDown(sf::RenderWindow& win)
-    {
-        int sq = view.squareAtPixel(mousePos);
-        int (sq < 0) return;
-        auto p = st.piece_at(sq);
-        if (p.color != st.side_to_move())
-        {
-            // Allow picking own side only (you can relax for analysis)
-            return;
-        }
+    void onDown() {
+        int sq = view.squareAt(mouse);
+        if (sq < 0) return;
 
-        selectedSq = sq;
-        dragging = true;
-        dragFromSq = sq;
+        ch::Color c; ch::PieceKind k;
+        if (!piece_at(board, sq, c, k)) return;
+        if (c != board.side_to_move()) return;
 
-        //cache legal moves targeting from selected square
-        legalTargets.clear();
-        cachedMoves = st.legal_moves(); // call your generator once
-        for(auto& m : cachedMoves) if (m.from == selectedSq) legalTargets.push_back(m.to);
+        cachedMoves.clear(); legalTargets.clear();
+        ch::generate_legal_moves(board, board.side_to_move(), cachedMoves);
+        for (auto& m : cachedMoves) if (m.from() == sq) legalTargets.push_back(m.to());
+
+        selected = sq; dragging = true; dragFrom = sq;
     }
 
-    void onMouseUp(sf::RenderWindow& win)
-    {
+    void onUp() {
         if (!dragging) return;
         dragging = false;
-        int targetSq = view.squareAtPixel(mousePos);
-        if (targetSq < 0) {selectedSq = -1; return }
 
-        // find a legal move matching from->to
-        auto it = std::find_if(cachedMoves.begin(), cachedMoves.end(),
-                    [&](const ch::Move& m) {return m.from == selectedSq && m.to == targetSq; });
+        int to = view.squareAt(mouse);
+        if (to < 0) { resetSel(); return; }
 
-        if (it != cachedMoves.end()) {
-            // promotion UI: if needed, pop a small modal to pick a piece, then set it->promotion
-            // For now we just pass the move through
-            if (st.make_move(*it)) {
-                lastMove = std::pair<int,int>{ it->from, it->to };
-            }
+        std::vector<ch::Move> cands;
+        for (auto& m : cachedMoves) if (m.from()==selected && m.to()==to) cands.push_back(m);
+
+        if (!cands.empty()) {
+            ch::Move mv = choosePromotion(cands);
+            ch::State st{};
+            history.push_back(st);
+            ch::make_move(board, mv, history.back());
+            played.push_back(mv);
+            lastMove = std::pair{mv.from(), mv.to()};
         }
 
-        selectedSq = -1;
-        legalTargets.clear();
-        cachedMoves.clear();
+        resetSel();
     }
 
-    ch::State& st;
-    BoardView& view;
-    BoardTheme theme;
+    void onUndo() {
+        if (history.empty() || played.empty()) return;
+        const ch::Move mv = played.back(); played.pop_back();
+        const ch::State st = history.back(); history.pop_back();
+        ch::unmake_move(board, mv, st);
+        lastMove.reset();
+    }
 
-    sf::Vector2f mousePos(0.f,0.f);
+    ch::Move choosePromotion(const std::vector<ch::Move>& cands) {
+        if (cands.size()==1) return cands[0];
+        auto it = std::find_if(cands.begin(), cands.end(),
+                               [](const ch::Move& m){ return m.promo_code()==3; }); // prefer Queen
+        return (it!=cands.end()? *it : cands.front());
+    }
 
-    bool dragging = false;
-    int drawFromSq = -1;
-    int selectedSq = -1;
+    void resetSel() { selected=-1; legalTargets.clear(); cachedMoves.clear(); }
+
+    BoardView view{};
+    Theme theme{};
+
+    sf::Vector2f mouse{0.f,0.f};
+    bool dragging=false;
+    int dragFrom=-1, selected=-1;
+
+    ch::Board& board;
+    std::vector<ch::State> history;
+    std::vector<ch::Move>  played;
+
     std::vector<ch::Move> cachedMoves;
     std::vector<int> legalTargets;
-    std::optional<std::pair<int,int>> lastMove = std::nullopt;
+    std::optional<std::pair<int,int>> lastMove;
 };
 
-int main()
-{
-    const int windowW = 800, windowH = 800;
-    sf::RenderWindow window(sf::VideoMode(windowW, windowH), "Chess GUI (C++ / SFML)");
-    window.setFramerateLimit(60);
+int main() {
+    ch::Board engineBoard;
+    ch::Board guiBoard; guiBoard.set_fen("rnbaqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBAQKBNR w KQkq - 0 1"); // replace with your start FEN helper if you have one
 
-    ch::State state; // <---- use your real state (initial FEN etc.)
-    BoardView view(90.f, 30.f);
-    GuiController gui(state,view);
+    sf::RenderWindow win(sf::VideoMode(sf::Vector2u{860u, 860u}), "ch GUI (SFML)");
+    win.setFramerateLimit(60);
 
-    while(window.isOpen())
-    {
-        sf::Event e;
-        while(window.pollEvent(e))
-        {
-            if (e.type == sf::Event::Closed) window.close();
-            gui.handleEvent(e,window);
+    Controller controller(guiBoard);
+
+    while (win.isOpen()) {
+        while (auto ev = win.pollEvent()) {
+            const sf::Event& e = *ev;
+            if (e.is<sf::Event::Closed>()) { win.close(); break; }
+            controller.handle(e);
         }
-
-        window.clear(sf::Color(30,30,30));
-        gui.draw(window);
-        window.display();
+        win.clear(sf::Color(30,30,30));
+        controller.draw(win);
+        win.display();
     }
     return 0;
 }

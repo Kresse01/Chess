@@ -1,58 +1,82 @@
-#include "chess/gen/ch_king_legal.h"
-#include "chess/core/ch_bitboard.h"
+// src/gen/ch_king_legal.cpp
+#include "chess/core/ch_board.h"
+#include "chess/core/ch_types.h"
+#include "chess/core/ch_square.h"     // for bit(sq), idx(f,r)
+#include "chess/analysis/ch_attack.h" // attacks_from(board, color, kind, fromSq)
 
-namespace ch
-{
-    
-    BB legal_king_moves(const Board& b, Color side)
-    {
-        BB kbb = b.bb(side, PieceKind::King);
-        if(!kbb) return 0;
-        int ks = lsb(kbb);
+namespace ch {
 
-        // Geometric king moves (no castling)
-        BB geo = KING_ATK[ks] & ~b.occ(side);
+// Explicit color flip (avoid ~side)
+static inline Color opponent(Color c) {
+    return (c == Color::White) ? Color::Black : Color::White;
+}
 
-        // Squares controlled by the opponent
-        BB enemy_ctrl = attacks_side(b, opposite(side));
+// Attack query using your existing per-piece attack generator.
+// We check whether ANY piece of 'by' attacks 'sq'.
+static bool square_attacked(const Board& board, Color by, int sq) {
+    const BB target = bit(sq);
 
-        BB legal = geo & ~enemy_ctrl;
+    // Iterate each piece kind for 'by'
+    for (int ki = 0; ki < 6; ++ki) {
+        const PieceKind kind = static_cast<PieceKind>(ki);
+        BB bbPieces = board.bb(by, kind);
+        if (!bbPieces) continue;
 
-        // --- Castling ---
-        const int r = (side == Color::White) ? 0 : 7;
-        const int e = idx(4, r);
-        const int f = idx(5, r);
-        const int g = idx(6, r);
-        const int d = idx(3, r);
-        const int c = idx(2, r);
-        const int b = idx(1, r);
-        const int a = idx(0, r);
-
-        // Don't allow castling if king not on starting square
-        if (ks == e)
-        {
-            auto empty = b.occ_all();
-
-            // King side: squares, f, g must be empty; e, f, g not attacked
-            if (b.castle_k(side))
-            {
-                if (!(empty & (bit(f)|bit(g))) && !(enemy_ctrl & (bit(e)|bit(f)|bit(g))))
-                {
-                    legal |= bit(g);
-                }
-            }
-
-            // Queen side: squares d, c, (and usually b) empty; e, d, c not attacked
-            if (b.castle_q(side))
-            {
-                if (!(empty & (bit(d)|bit(c)|bit(d))) && !(enemy_ctrl & (bit(e)|bit(d)|bit(c))))
-                {
-                    legal |= bit(c);
-                }
+        // Simple (portable) iterator over set bits
+        for (int from = 0; from < 64; ++from) {
+            if (bbPieces & bit(from)) {
+                BB atk = attacks_from(board, by, kind, from);
+                if (atk & target) return true;
             }
         }
-
-        // legal = geometric minus enemy control
-        return legal;
     }
+    return false;
 }
+
+// Return legal king destinations that are specific to CASTLING.
+// (Normal king 1-step moves are handled elsewhere in your movegen;
+// this function’s main job is to contribute castle targets G/C when legal.)
+BB legal_king_moves(const Board& board, Color side) {
+    BB out = 0;
+
+    const int r  = (side == Color::White) ? 0 : 7;
+    const int sqA = idx(0, r);
+    const int sqB = idx(1, r);
+    const int sqC = idx(2, r);
+    const int sqD = idx(3, r);
+    const int sqE = idx(4, r);
+    const int sqF = idx(5, r);
+    const int sqG = idx(6, r);
+    const int sqH = idx(7, r);
+
+    const BB empty = ~board.occ_all();
+    const Color opp = opponent(side);
+
+    // --- King-side castle (E -> G) ---
+    if (board.castle_k(side)) {
+        const bool pathEmpty = (empty & bit(sqF)) && (empty & bit(sqG));
+        if (pathEmpty) {
+            const bool safe =
+                !square_attacked(board, opp, sqE) &&
+                !square_attacked(board, opp, sqF) &&
+                !square_attacked(board, opp, sqG);
+            if (safe) out |= bit(sqG);
+        }
+    }
+
+    // --- Queen-side castle (E -> C) ---
+    if (board.castle_q(side)) {
+        const bool pathEmpty = (empty & bit(sqD)) && (empty & bit(sqC)) && (empty & bit(sqB));
+        if (pathEmpty) {
+            const bool safe =
+                !square_attacked(board, opp, sqE) &&
+                !square_attacked(board, opp, sqD) &&
+                !square_attacked(board, opp, sqC);
+            if (safe) out |= bit(sqC);
+        }
+    }
+
+    return out;
+}
+
+} // namespace ch

@@ -131,21 +131,6 @@ namespace ch
         return true;
     }
 
-    static inline PieceKind char_to_kind(char p)
-    {
-        switch (std::tolower(static_cast<unsigned char>(p)))
-        {
-            case 'p' : return PieceKind::Pawn;
-            case 'n' : return PieceKind::Knight;
-            case 'b' : return PieceKind::Bishop;
-            case 'r' : return PieceKind::Rook;
-            case 'q' : return PieceKind::Queen;
-            case 'k' : return PieceKind::King;
-        }
-        // not reached for valid inputs
-        return PieceKind::Pawn;
-    }
-
     static inline char kind_to_char(PieceKind k, Color c)
     {
         char ch = 'p';
@@ -162,17 +147,6 @@ namespace ch
 
         if (c == Color::White) ch = static_cast<char>(std::toupper(static_cast<unsigned char>(ch)));
         return ch;
-    }
-
-    void Board::rebuild_occ()
-    {
-        occ_[0] = occ_[1] = 0;
-        for (int k = 0; k < 6; ++k)
-        {
-            occ_[0] |= bb_[0][k];
-            occ_[1] |= bb_[1][k];
-        }
-        occ_all_ = occ_[0] | occ_[1];
     }
 
     std::string Board::to_fen() const
