@@ -121,9 +121,6 @@ namespace ch
 
         assert(st.moved != PieceKind::None && "No moving piece on 'from' for side_to_move");
 
-        // EP target: clear by default; may set on a double pawn push
-        b.set_ep_target(-1);
-
         const bool isPawn = (st.moved == PieceKind::Pawn);
         bool didCapture = false;
         if (m.is_capture())
@@ -145,6 +142,9 @@ namespace ch
             didCapture = true;
         }
 
+        // EP target: clear by default; may set on a double pawn push
+        b.set_ep_target(-1);
+        
         // ---- Move the piece (promotion / castling handled here) ---
         if (isPawn)
         {
@@ -179,12 +179,12 @@ namespace ch
                 st.was_castle = true;
                 // King
                 b.clear_piece(side, PieceKind::King, from);
-                b.clear_piece(side, PieceKind::King, to);
+                b.set_piece(side, PieceKind::King, to);
                 // Rook
                 const int rf = castle_rook_from(side, kingSide);
                 const int rt = castle_rook_to(side, kingSide);
                 b.clear_piece(side, PieceKind::Rook, rf);
-                b.clear_piece(side,PieceKind::Rook, rt);
+                b.set_piece(side,PieceKind::Rook, rt);
 
                 clear_castle_for_king(b,side);
             } else {

@@ -35,7 +35,7 @@ namespace ch
         int e = (r << 3) | 4;
         int g = (r << 3) | 6;
         int c = (r << 3) | 2;
-        return (from == e) && (to == g || to || c);
+        return (from == e) && (to == g || to == c);
     }
 
     void generate_legal_moves(const Board& b, Color side, std::vector<Move>& out)
@@ -61,12 +61,6 @@ namespace ch
                 int ks = lsb(kbb);
                 // Legal king steps (no castling yet)
                 BB ksteps = legal_king_moves(b, side);
-
-                // Push normal king moves
-                BB kcaps = ksteps & enemyOcc;
-                BB kquiet = ksteps & ~enemyOcc;
-                push_moves_from_mask(ks, kquiet, false, out);
-                push_moves_from_mask(ks, kcaps, true, out);
 
                 // Emit each destination and mark castling as special
                 for (BB m = ksteps; m; )
@@ -99,7 +93,7 @@ namespace ch
         {
             int s = lsb(pcs); pcs ^= bit(s);
             BB pseudo = move(Bishop, side, s, b, MovePhase::All, opts);
-            BB legal = legalize_nonking_mask(b, pseudo, s, PieceKind::Bishop,side,pins,cs);
+            BB legal = legalize_nonking_mask(b, pseudo, s, PieceKind::Bishop, side, pins, cs);
             BB cap = legal & enemyOcc;
             BB qui = legal & ~enemyOcc;
             push_moves_from_mask(s, qui, false, out);
@@ -146,9 +140,13 @@ namespace ch
                 BB pseudo_all = pc | pq;
                 BB legal_all = legalize_nonking_mask(b, pseudo_all, s, PieceKind::Pawn, side, pins, cs);
 
+                const int ep = opts.ep_sq;
+                const BB ep_bit = (ep>=0 ? bit(ep) : BB(0));
+
                 // Split captures/quiet after legalization
+                BB legal_ep = legal_all & ep_bit;
                 BB legal_capt = legal_all & enemyOcc;
-                BB legal_quiet = legal_all & ~b.occ_all(); // only empties
+                BB legal_quiet = legal_all & ~(b.occ_all() | ep_bit); // only empties
 
                 // promotions (dest on last rank)
                 auto emit_range = [&](BB mask, bool isCap)
@@ -166,6 +164,13 @@ namespace ch
                 };
                 emit_range(legal_quiet, false);
                 emit_range(legal_capt, true);
+
+                while(legal_ep)
+                {
+                    int to = lsb(legal_ep); legal_ep ^= bit(to);
+                    // EP can't be promoted square in standard chess
+                    out.push_back(Move::make(s,to,/*capture=*/true,/*promo=*/0,/*special=*/true));
+                }
             }
         }
     }

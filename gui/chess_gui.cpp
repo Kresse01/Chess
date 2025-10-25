@@ -5,6 +5,7 @@
 #include <string>
 #include <cassert>
 #include <cctype>
+#include <array>
 
 #include "chess/core/ch_board.h"
 #include "chess/core/ch_move.h"
@@ -48,12 +49,61 @@ static const char* letter(ch::PieceKind k) {
     }
 }
 
+struct PieceAtlas {
+    // order [color][kind] -> texture
+    // color 0 = white, 1 = black
+    // kind index 1..6 -> P, N, B, R, Q, K; 0 is unused
+    std::array<std::array<sf::Texture,7>,2> tex{};
+    bool loaded = false;
+    static const char* kindName(int kind)
+    {
+        switch(kind) {
+            case 1: return "Pawn";
+            case 2: return "Knight";
+            case 3: return "Bishop";
+            case 4: return "Rook";
+            case 5: return "Queen";
+            case 6: return "King";
+            default: return "Unknown";
+        }
+    }
+
+    bool loadFrom(const std::string& baseDir)
+    {
+        if (loaded) return true;
+        for (int col = 0; col < 2; ++col)
+        {
+            const char cw = (col==0 ? 'W' : 'B');
+            for (int k = 1; k <= 6; ++k)
+            {
+                std::string path = baseDir + "/" + kindName(k) + cw + ".png";
+                if (!tex[col][k].loadFromFile(path)) {
+                    std::string path2 = baseDir + "/" + std::string(1, std::tolower(kindName(k)[0])) + (kindName(k)+1) + cw + ".png";
+                    if (!tex[col][k].loadFromFile(path2)) return false;
+                }
+                tex[col][k].setSmooth(true);
+            }
+        }
+        loaded = true;
+        return true;
+    }
+
+    const sf::Texture& get(int color, int kind) const
+    {
+        return tex[color > 0 ? 0 : 1][kind];
+    }
+};
+
 } // namespace
 
 // ---------------- BoardView ----------------
 class BoardView {
 public:
-    BoardView(float tile=96.f, float margin=20.f) : tile(tile), margin(margin) {}
+    BoardView(float tile=192.f, float margin=40.f, std::string assets="gui/figures") : tile(tile), margin(margin), assetsDir(std::move(assets)) {
+        if(!atlas.loadFrom(assetsDir)) {
+            atlas.loadFrom("../" + assetsDir);
+        }
+    }
 
     int squareAt(sf::Vector2f p) const {
         float x = p.x - margin, y = p.y - margin;
@@ -104,28 +154,32 @@ public:
     void drawPieces(sf::RenderWindow& w, const ch::Board& B,
                     std::optional<int> dragging, sf::Vector2f dragPos) const
     {
-        static sf::Font font; static bool loaded=false;
-        if (!loaded) loaded = font.openFromFile("C:/Users/gusta/Desktop/Chess/gui/DejaVuSans.ttf");
-
         auto draw_one = [&](int sq, sf::Vector2f pos){
             ch::Color c; ch::PieceKind k;
             if (!piece_at(B, sq, c, k)) return;
+            int color = (c == ch::Color::White) ? +1 : -1;
+            int kindIndex = 0;
+            switch (k) {
+                case ch::PieceKind::Pawn:   kindIndex = 1; break;
+                case ch::PieceKind::Knight: kindIndex = 2; break;
+                case ch::PieceKind::Bishop: kindIndex = 3; break;
+                case ch::PieceKind::Rook:   kindIndex = 4; break;
+                case ch::PieceKind::Queen:  kindIndex = 5; break;
+                case ch::PieceKind::King:   kindIndex = 6; break;
+                default: return;
+            }
 
-            // In SFML 3, provide font in constructor
-            sf::Text t(font, letter(k), unsigned(tile*0.7f));
-            bool white = (c == ch::Color::White);
-            t.setFillColor(white ? sf::Color::White : sf::Color::Black);
-            t.setOutlineThickness(2.f);
-            t.setOutlineColor(white ? sf::Color::Black : sf::Color::White);
+            const sf::Texture& tex = atlas.get(color, kindIndex);
+            sf::Sprite sprite(tex);
 
-            // Center text inside tile using new bounds API: position + size
-            const auto lb = t.getLocalBounds();
-            const sf::Vector2f origin(lb.position.x + lb.size.x/2.f,
-                                      lb.position.y + lb.size.y/2.f);
-            t.setOrigin(origin);
-            t.setPosition(sf::Vector2f(pos.x + tile/2.f, pos.y + tile/2.f));
+            // scale to exactly one tile (assumes square images or transparent margin)
+            auto sz = tex.getSize();
+            float sx = tile / static_cast<float>(sz.x);
+            float sy = tile / static_cast<float>(sz.y);
+            sprite.setScale(sf::Vector2f(sx, sy));
+            sprite.setPosition(pos); // top-left of the square
 
-            w.draw(t);
+            w.draw(sprite);
         };
 
         for (int sq=0; sq<64; ++sq) if (!(dragging && *dragging==sq)) {
@@ -137,8 +191,11 @@ public:
         }
     }
 
-    float tile{96.f};
-    float margin{20.f};
+    float tile{192.f};
+    float margin{40.f};
+private:
+    std::string assetsDir;
+    PieceAtlas atlas;
 };
 
 // ---------------- Controller ----------------
@@ -242,10 +299,11 @@ private:
 };
 
 int main() {
+    ch::init_bitboards();
     ch::Board engineBoard;
-    ch::Board guiBoard; guiBoard.set_fen("rnbaqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBAQKBNR w KQkq - 0 1"); // replace with your start FEN helper if you have one
+    ch::Board guiBoard; guiBoard.set_fen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"); // replace with your start FEN helper if you have one
 
-    sf::RenderWindow win(sf::VideoMode(sf::Vector2u{860u, 860u}), "ch GUI (SFML)");
+    sf::RenderWindow win(sf::VideoMode(sf::Vector2u{1720u, 1720u}), "ch GUI (SFML)");
     win.setFramerateLimit(60);
 
     Controller controller(guiBoard);
