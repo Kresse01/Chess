@@ -105,6 +105,8 @@ public:
         }
     }
 
+    const PieceAtlas& getAtlas() const { return atlas; }
+
     int squareAt(sf::Vector2f p) const {
         float x = p.x - margin, y = p.y - margin;
         if (x < 0 || y < 0) return -1;
@@ -198,27 +200,211 @@ private:
     PieceAtlas atlas;
 };
 
+// --- Sprite-based promotion popup ------------------------------------------
+class PromotionPopup {
+public:
+    // promoCode mapping must match your Move::promo_code(): 3=Q, 2=R, 1=B, 0=N
+    struct Choice { int kindIndex; int promoCode; }; // kindIndex: 2=N,3=B,4=R,5=Q
+
+    explicit PromotionPopup(const PieceAtlas* atlas = nullptr) : atlas(atlas) {
+        // Default order (left→right): Q R B N
+        choices = {
+            Choice{5, 3}, // Queen
+            Choice{4, 2}, // Rook
+            Choice{3, 1}, // Bishop
+            Choice{2, 0}, // Knight
+        };
+    }
+
+    void setAtlas(const PieceAtlas* a) { atlas = a; }
+
+    // Open near 'screenPos' (top-left of destination square), colored by 'side'
+    void open(sf::Vector2f squareTL, ch::Color side, float tile, sf::Vector2u winSize) {
+        visible = true;
+        winner.reset();
+        whiteMove = (side == ch::Color::White);
+
+        float pad = tile*0.12f;
+        btnSize   = sf::Vector2f(tile*0.85f, tile*0.85f); // a bit larger for sprites
+        gap       = tile*0.08f;
+        boxSize   = sf::Vector2f(4 * btnSize.x + 3 * gap + 2*pad, btnSize.y + 2*pad);
+
+        // Base position: below for White, above for Black
+        const float edgeGap = std::max(8.f, tile * 0.05f);
+        const float desiredY = whiteMove
+            ? (squareTL.y + tile + edgeGap)                    // below
+            : (squareTL.y - boxSize.y - edgeGap);              // above
+
+        // Center horizontally over the square
+        float x = squareTL.x + (tile - boxSize.x) * 0.5f;
+        float y = desiredY;
+
+        // Clamp inside the window
+        auto clampf = [](float v, float lo, float hi) { return std::max(lo, std::min(v, hi)); };
+        x = clampf(x, edgeGap, std::max(edgeGap, float(winSize.x) - boxSize.x - edgeGap));
+        y = clampf(y, edgeGap, std::max(edgeGap, float(winSize.y) - boxSize.y - edgeGap));
+
+        boxPos = sf::Vector2f(x, y);
+
+        btns.clear();
+        sf::Vector2f p = boxPos + sf::Vector2f(pad, pad);
+        for (int i=0; i<4; ++i) {
+            btns.emplace_back(sf::FloatRect(p, btnSize));
+            p.x += btnSize.x + gap;
+        }
+    }
+
+    void close() { visible = false; winner.reset(); }
+
+    void draw(sf::RenderWindow& w) const {
+        if (!visible || !atlas) return;
+
+        // dim background
+        sf::RectangleShape dim(sf::Vector2f(float(w.getSize().x), float(w.getSize().y)));
+        dim.setFillColor(sf::Color(0,0,0,120));
+        w.draw(dim);
+
+        // box
+        sf::RectangleShape box(boxSize);
+        box.setPosition(boxPos);
+        box.setFillColor(sf::Color(245,245,245));
+        box.setOutlineThickness(2.f);
+        box.setOutlineColor(sf::Color(40,40,40));
+        w.draw(box);
+
+        // buttons with sprites
+        for (int i=0; i<4; ++i) {
+            // button chrome
+            sf::RectangleShape r(sf::Vector2f(btnSize.x, btnSize.y));
+            r.setPosition(sf::Vector2f(btns[i].position.x, btns[i].position.y));
+            r.setFillColor(sf::Color(230,230,230));
+            r.setOutlineThickness(1.5f);
+            r.setOutlineColor(sf::Color(90,90,90));
+            w.draw(r);
+
+            // sprite for (side, kindIndex)
+            int color = whiteMove ? +1 : -1;
+            const sf::Texture& tex = atlas->get(color, choices[i].kindIndex);
+            sf::Sprite sp(tex);
+
+            // scale to fit nicely inside button (with a little padding)
+            auto sz = tex.getSize();
+            const float pad = 6.f;
+            const float targetW = btnSize.x - 2*pad;
+            const float targetH = btnSize.y - 2*pad;
+            float sx = targetW / float(sz.x);
+            float sy = targetH / float(sz.y);
+            float s  = std::min(sx, sy);
+            sp.setScale(sf::Vector2f(s, s));
+
+            // center sprite in button
+            const float bx = btns[i].position.x;
+            const float by = btns[i].position.y;
+            const float sw = float(sz.x) * s;
+            const float sh = float(sz.y) * s;
+            sp.setPosition(sf::Vector2f(bx + (btnSize.x - sw)/2.f,
+                                        by + (btnSize.y - sh)/2.f));
+
+            w.draw(sp);
+        }
+    }
+
+    bool handleClick(sf::Vector2f mouse) {
+        if (!visible) return false;
+        for (int i=0; i<4; ++i) {
+            if (btns[i].contains(mouse)) {
+                winner = choices[i].promoCode; // 3/2/1/0
+                visible = false;
+                return true;
+            }
+        }
+        // Consume clicks while visible (prevents interacting with board under it)
+        return true;
+    }
+
+    bool hasWinner() const { return winner.has_value(); }
+    int  winnerPromoCode() const { return *winner; }
+    bool isVisible() const { return visible; }
+
+private:
+    const PieceAtlas* atlas = nullptr; // provided by BoardView
+
+    bool visible = false;
+    bool whiteMove = true;
+
+    sf::Vector2f boxPos{}, boxSize{}, btnSize{};
+    float gap = 8.f;
+
+    std::vector<sf::FloatRect> btns;
+    std::array<Choice, 4> choices;
+    std::optional<int> winner;
+};
+
 // ---------------- Controller ----------------
 class Controller {
 public:
-    Controller(ch::Board& B) : board(B) {}
-
+    Controller(ch::Board& B) : board(B) {
+        promo.setAtlas(&view.getAtlas());
+    }
+    
     void handle(const sf::Event& e) {
         if (const auto* mm = e.getIf<sf::Event::MouseMoved>()) {
             mouse = sf::Vector2f(float(mm->position.x), float(mm->position.y));
-        } else if (const auto* mbp = e.getIf<sf::Event::MouseButtonPressed>()) {
+            return;
+        }
+
+        // If a promotion choice is pending, consume mouse clicks for the popup
+        if (awaitingPromotion) {
+            if (const auto* mbp = e.getIf<sf::Event::MouseButtonPressed>()) {
+                if (mbp->button == sf::Mouse::Button::Left) {
+                    promo.handleClick(sf::Vector2f(float(mbp->position.x), float(mbp->position.y)));
+                    if (promo.hasWinner()) {
+                        // choose the candidate with that promo_code()
+                        int want = promo.winnerPromoCode(); // 3=Q,2=R,1=B,0=N
+                        ch::Move mv = pendingPromoMoves.front();
+                        for (const auto& m : pendingPromoMoves) if (m.promo_code() == want) { mv = m; break; }
+
+                        ch::State st{};
+                        history.push_back(st);
+                        ch::make_move(board, mv, history.back());
+                        played.push_back(mv);
+                        lastMove = std::pair{mv.from(), mv.to()};
+
+                        awaitingPromotion = false;
+                        pendingPromoMoves.clear();
+                        pendingFrom = pendingTo = -1;
+                    }
+                }
+                return; // block board input while popup shown
+            }
+
+            // Block other inputs too while the popup is visible
+            return;
+        }
+
+        // Normal input path when no popup is showing
+        if (const auto* mbp = e.getIf<sf::Event::MouseButtonPressed>()) {
             if (mbp->button == sf::Mouse::Button::Left) onDown();
-        } else if (const auto* mbr = e.getIf<sf::Event::MouseButtonReleased>()) {
+            return;
+        }
+        if (const auto* mbr = e.getIf<sf::Event::MouseButtonReleased>()) {
             if (mbr->button == sf::Mouse::Button::Left) onUp();
-        } else if (const auto* kp = e.getIf<sf::Event::KeyPressed>()) {
+            return;
+        }
+        if (const auto* kp = e.getIf<sf::Event::KeyPressed>()) {
             if (kp->code == sf::Keyboard::Key::U) onUndo();
+            return;
         }
     }
 
     void draw(sf::RenderWindow& w) {
+        windowSize = w.getSize();
         view.drawBoard(w, theme, lastMove);
         if (selected >= 0) view.drawLegalDots(w, theme, legalTargets);
         view.drawPieces(w, board, dragging? std::optional<int>(dragFrom) : std::nullopt, mouse);
+
+        if(awaitingPromotion)
+            promo.draw(w);
     }
 
     void setFromFEN(const std::string& fen) {
@@ -250,20 +436,77 @@ private:
         int to = view.squareAt(mouse);
         if (to < 0) { resetSel(); return; }
 
+        // Collect all legal moves that match the drag from->to
         std::vector<ch::Move> cands;
-        for (auto& m : cachedMoves) if (m.from()==selected && m.to()==to) cands.push_back(m);
+        for (const auto& m : cachedMoves)
+            if (m.from() == selected && m.to() == to)
+                cands.push_back(m);
 
-        if (!cands.empty()) {
-            ch::Move mv = choosePromotion(cands);
-            ch::State st{};
-            history.push_back(st);
-            ch::make_move(board, mv, history.back());
-            played.push_back(mv);
-            lastMove = std::pair{mv.from(), mv.to()};
+        if (cands.empty()) { resetSel(); return; }
+
+        // ---- Promotion case: show popup and defer making the move ----
+        // If there are multiple candidates differentiated by promo_code (0..3),
+        // we open the popup and let the user choose N/B/R/Q.
+        bool hasPromotionVariants = false;
+        for (const auto& m : cands) {
+            // Your Move::promo_code() returns 0..3 for N/B/R/Q, and something else for non-promo
+            if (m.promo_code() >= 0 && m.promo_code() <= 3) { hasPromotionVariants = true; break; }
         }
+
+        if (hasPromotionVariants && cands.size() > 1) {
+            awaitingPromotion = true;
+            pendingPromoMoves = cands;
+            pendingFrom = selected;
+            pendingTo   = to;
+
+            promoMovesForButtons = {};
+            const int wantKindIdx[4] = {5, 4, 3, 2};
+
+            for (const auto& m : pendingPromoMoves) {
+                ch::Board tmp = board;
+                ch::State st{};
+                ch::make_move(tmp,m,st);
+                ch::Color rc; ch::PieceKind rk;
+                if(!piece_at(tmp,pendingTo,rc,rk)) continue;
+
+                int kindIdx = 0;
+                switch(rk) {
+                    case ch::PieceKind::Pawn: kindIdx = 1; break;
+                    case ch::PieceKind::Knight: kindIdx = 2; break;
+                    case ch::PieceKind::Bishop: kindIdx = 3; break;
+                    case ch::PieceKind::Rook: kindIdx = 4; break;
+                    case ch::PieceKind::Queen: kindIdx = 5; break;
+                    default: continue;
+                }
+
+                for (int i = 0; i < 4; ++i) if (kindIdx == wantKindIdx[i] && !promoMovesForButtons[i]) {
+                    promoMovesForButtons[i] = m;
+                    break;
+                }
+            }
+
+            // Place popup near the destination square
+            auto TL = view.topLeft(to);
+            promo.open(sf::Vector2f(TL.x, TL.y), board.side_to_move(),view.tile,windowSize);
+
+            resetSel();              // clear highlight/drag state
+            return;                  // wait for user to click a sprite in the popup
+        }
+
+        // ---- Normal move (no promotion choice required) ----
+        // Prefer a special move (e.g., castling) if there are multiple
+        ch::Move mv = cands.front();
+        for (const auto& m : cands) if (m.is_special()) { mv = m; break; }
+
+        ch::State st{};
+        history.push_back(st);
+        ch::make_move(board, mv, history.back());
+        played.push_back(mv);
+        lastMove = std::pair{ mv.from(), mv.to() };
 
         resetSel();
     }
+
 
     void onUndo() {
         if (history.empty() || played.empty()) return;
@@ -288,6 +531,14 @@ private:
     sf::Vector2f mouse{0.f,0.f};
     bool dragging=false;
     int dragFrom=-1, selected=-1;
+
+    bool awaitingPromotion = false;
+    std::vector<ch::Move> pendingPromoMoves;
+    int pendingFrom = -1, pendingTo = -1;
+    PromotionPopup promo;
+    std::array<std::optional<ch::Move>,4> promoMovesForButtons;
+
+    sf::Vector2u windowSize{0,0};
 
     ch::Board& board;
     std::vector<ch::State> history;

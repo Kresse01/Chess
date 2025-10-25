@@ -18,7 +18,7 @@ namespace ch
     /* Promotion code mapping:
     Matches the order you used when emitting promotions in movegen:
         push_promotions(...): codes 0, 1, 2, 3
-    We'll interpret as: 0=N, 1=B, 2=R, 3=Q.
+    We'll interpret as: 1=N, 2=B, 3=R, 4=Q.
     */
     static inline PieceKind promo_code_to_kind(uint8_t code)
     {
