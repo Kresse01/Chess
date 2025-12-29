@@ -148,7 +148,7 @@ namespace ch
         // ---- Move the piece (promotion / castling handled here) ---
         if (isPawn)
         {
-            if(st.promo_code && is_promotion_dest(side,to))
+            if(is_promotion_dest(side,to))
             {
                 // Promotion: from pawn -> to promoted piece
                 b.clear_piece(side, PieceKind::Pawn, from);
