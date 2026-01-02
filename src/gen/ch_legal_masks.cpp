@@ -1,18 +1,28 @@
 #include "chess/gen/ch_legal_masks.h"
+
+#include "chess/core/ch_bitboard.h"
+#include "chess/core/ch_board.h"
+
 #include "chess/analysis/ch_legality.h"
 #include "chess/analysis/ch_pins.h"
+
 #include "chess/gen/ch_legalize.h"
+#include "chess/gen/ch_king_legal.h"
+
+#include "chess/pieces/ch_piece.h"
 
 namespace ch
 {
     LegalMasks legal_masks_for_side(const Board& b, Color side)
     {
         LegalMasks out{};
-        MoveOpts o; //default: no EP shaping or castling shaping here
 
         // Precompute context
         Pins pins = compute_pins(b, side);
         CheckState cs = compute_check_state(b, side);
+
+        MoveOpts opts;
+        opts.ep_sq = b.ep_target();
 
         // King (no castling yet)
         {
@@ -20,29 +30,53 @@ namespace ch
             if(kbb)
             {
                 int ks = lsb(kbb);
-                out.per_square[ks] = legal_king_moves(b, side); // already excludes enemy control and own occ
+                out.per_square[ks] = legal_king_moves(b, side);
             }
         }
 
-        if (cs.double_check) return out; // only king moves legal
+        // If double-check: only king moves are legal
+        if (cs.double_check) return out;
 
-        // For each non-king kind, legalize its pseudo mask
-        auto do_kind = [&](PieceKind k, auto tag)
+        // Knights
+        for (BB pcs = b.bb(side, PieceKind::Knight); pcs; )
         {
-            for (BB pcs = b.bb(side, k); pcs; )
-            {
-                int s = lsb(pcs); pcs ^= bit(s);
-                BB pseudo = move(tag, side, s, b, MovePhase::All, o);
-                out.per_square[s] = legalize_nonking_mask(b,pseudo, s, k, side, pins, cs);
-            }
-        };
+            int s = lsb(pcs); pcs ^= bit(s);
+            BB pseudo = move(Knight, side, s, b, MovePhase::All, opts);
+            out.per_square[s] = legalize_nonking_mask(b, pseudo, s, PieceKind::Knight, side, pins, cs);
+        }
 
-        do_kind(PieceKind::Pawn, Pawn);
-        do_kind(PieceKind::Knight, Knight);
-        do_kind(PieceKind::Bishop, Bishop);
-        do_kind(PieceKind::Rook, Rook);
-        do_kind(PieceKind::Queen, Queen);
+        // Bishops
+        for (BB pcs = b.bb(side, PieceKind::Bishop); pcs; )
+        {
+            int s = lsb(pcs); pcs ^= bit(s);
+            BB pseudo = move(Bishop, side, s, b, MovePhase::All, opts);
+            out.per_square[s] = legalize_nonking_mask(b, pseudo, s, PieceKind::Bishop, side, pins, cs);
+        }
+
+        // Rooks
+        for (BB pcs = b.bb(side, PieceKind::Rook); pcs; )
+        {
+            int s = lsb(pcs); pcs ^= bit(s);
+            BB pseudo = move(Rook, side, s, b, MovePhase::All, opts);
+            out.per_square[s] = legalize_nonking_mask(b, pseudo, s, PieceKind::Rook, side, pins, cs);
+        }
+
+        // Queens
+        for (BB pcs = b.bb(side, PieceKind::Queen); pcs; )
+        {
+            int s = lsb(pcs); pcs ^= bit(s);
+            BB pseudo = move(Queen, side, s, b, MovePhase::All, opts);
+            out.per_square[s] = legalize_nonking_mask(b, pseudo, s, PieceKind::Queen, side, pins, cs);
+        }
+
+        // Pawns
+        for (BB pcs = b.bb(side, PieceKind::Pawn); pcs; )
+        {
+            int s = lsb(pcs); pcs ^= bit(s);
+            BB pseudo = move(Pawn, side, s, b, MovePhase::All, opts);
+            out.per_square[s] = legalize_nonking_mask(b, pseudo, s, PieceKind::Pawn, side, pins, cs);
+        }
 
         return out;
     }   
-}
+} // namespace ch

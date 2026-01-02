@@ -23,14 +23,23 @@ namespace ch
     {
         BB empty = ~b.occ_all();
         BB from = bit(s);
-        if (c==Color::White)
+
+        if (c == Color::White)
         {
             BB one = (from << 8) & empty;
-            BB two = ((s >> 3) == 1) ? ((one << 8) & empty) : 0;
+
+            BB two = 0;
+            if (o.allow_double_push && (s >> 3) == 1)
+                two = (one << 8) & empty;
             return one | two;
-        } else {
-            BB one = (from >> 8) & empty;
-            BB two = ((s >> 3) == 6) ? ((one >> 8) & empty) : 0;
+        }
+        else
+        {
+            const BB one = (from >> 8) & empty;
+
+            BB two = 0;
+            if (o.allow_double_push && (s >> 3) == 6)
+                two = (one >> 8) & empty;
             return one | two;
         }
     }
@@ -41,21 +50,32 @@ namespace ch
         BB enemy = b.occ(opposite(c));
         BB from = bit(s);
 
+        // IMPORTANT: mask source file BEFORE shifting to avoid wrap-around.
+        BB diagL = 0;
+        BB diagR = 0;   
+
         if (c == Color::White)
         {
-            BB l = (from<<7) & ~FILE_MASK[7]; //up-left
-            BB r = (from<<9) & ~FILE_MASK[0]; //up-right
-            BB caps = (l|r) & enemy;
-            //En-passant: allow capturing onto ep_sq if diagonally reachable
-            if (o.ep_sq >= 0) caps |= (l | r) & bit(o.ep_sq);
-            return caps;
-        } else {
-            BB l = (from>>9) & ~FILE_MASK[7]; //down-left
-            BB r = (from>>7) & ~FILE_MASK[0]; //down-right
-            BB caps = (l | r)& enemy;
-            if (o.ep_sq >= 0) caps |= (l | r) & bit(o.ep_sq);
-            return caps;
+            // up-left: +7 (must not start on file A)
+            diagL = ((from & ~FILE_MASK[0]) << 7);
+            // up-right: +9 (must not start on file H)
+            diagR = ((from & ~FILE_MASK[7]) << 9);
         }
+        else
+        {
+            // down-left: -9 (must not start on file A)
+            diagL = ((from & ~FILE_MASK[0]) >> 9);
+            // down-right: -7 (must not start on file H)
+            diagR = ((from & ~FILE_MASK[7]) >> 7);
+        }
+        
+        BB caps = (diagL | diagR) & enemy;
+
+        // En-passant: allow capturing onto ep_sq if diagonally reachable
+        if (o.ep_sq >= 0)
+            caps |= (diagL | diagR) & bit(o.ep_sq);
+
+        return caps;
     }
 
     /**
@@ -75,4 +95,4 @@ namespace ch
         }
         return 0;
     }
-}
+} // namespace ch

@@ -1,6 +1,7 @@
 #include "chess/gen/ch_legalize.h"
+
+#include "chess/core/ch_board.h"
 #include "chess/core/ch_bitboard.h"
-#include "chess/analysis/ch_attack.h"
 
 namespace ch
 {
@@ -16,6 +17,7 @@ namespace ch
         return ((t << 9) & ~FILE_MASK[0]) | ((t << 7) & ~FILE_MASK[7]);
     }
 
+    // EP legality: check king safety after EP capture using modified occupancy.
     static bool king_safe_after_ep(const Board& b, Color side, int fromSq, int ep_to)
     {
         const Color them = opposite(side);
@@ -26,16 +28,20 @@ namespace ch
         // Captured pawn square is behind EP target
         const int cap_sq = (side == Color::White) ? (ep_to - 8) : (ep_to + 8);
 
+        // Build occupancy after EP (without mutating the board):
         BB occ = b.occ_all();
         occ &= ~bit(fromSq); // moving pawn leaves from
         occ &= ~bit(cap_sq); // captured pawn dissappears
         occ |= bit(ep_to); // our pawn lands on ep_to
 
+        // Enemy pawns without the captured pawn
         BB e_pawns = b.bb(them, PieceKind::Pawn) & ~bit(cap_sq);
 
+        // Check attacks on our king using the modified occupancy:
         BB attackers = 0;
         attackers |= KNIGHT_ATK[ks] & b.bb(them, PieceKind::Knight);
         attackers |= KING_ATK[ks] & b.bb(them,PieceKind::King);
+
         if (them == Color::White) attackers |= white_pawns_attacking_to(ks) & e_pawns;
         else                      attackers |= black_pawns_attacking_to(ks) & e_pawns;
 
@@ -73,10 +79,11 @@ namespace ch
         }
 
         // 3) If in single check, non-king moves must block or capture the checker
-        //    compute_check_state() must set: block_or_capture = between(king, checker) U {checker}
+        //    compute_check_state() must set:
+        //      block_mask = between(king, checker) U {checker}
         if (cs.in_check)
         {
-            pseudo &= cs.block_or_capture;
+            pseudo &= cs.block_mask;
         }
 
         // EP: keep it only if the king remains after EP
@@ -96,4 +103,4 @@ namespace ch
 
         return pseudo;
     }
-}
+} // namespace ch

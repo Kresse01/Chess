@@ -1,93 +1,117 @@
 #include "chess/analysis/ch_pins.h"
-#include <cstdlib>
+
+#include "chess/core/ch_board.h"
+#include "chess/core/ch_bitboard.h"
 
 namespace ch
 {
-    static inline int file_of(int s){return s & 7; }
-    static inline int rank_of(int s){return s >> 3; }
-
-    static inline bool slider_matches_dir(PieceKind k, int dfile, int drank)
+    namespace
     {
-        //Orthogonal if exactly one delta axis is 0; diagonal if |df|==|dr|
-        bool ortho = (dfile == 0) ^ (drank == 0);
-        bool diag = (dfile != 0) && (std::abs(dfile) == std::abs(drank));
-        if (k == PieceKind::Rook) return ortho;
-        if (k == PieceKind::Bishop) return diag;
-        if (k == PieceKind::Queen) return ortho | diag;
-        return false;
-    }
+        // Step from sq by dir, but stop if we wrap across files.
+        // Returns next square index or -1 if stepping leaves the board.
+        inline int step_sq(int sq, Dir dir) noexcept
+        {
+            const int to = sq + static_cast<int>(dir);
+
+            if (to < 0 || to >= 64) return -1;
+
+            // File-wrap prevention for E/W and diagonals
+            const int f0 = sq & 7;
+            const int f1 = to & 7;
+            const int df = f1 - f0;
+
+            switch (dir)
+            {
+                case E:  if (df != 1)  return -1; break;
+                case W:  if (df != -1) return -1; break;
+                case NE: if (df != 1)  return -1; break;
+                case NW: if (df != -1) return -1; break;
+                case SE: if (df != 1)  return -1; break;
+                case SW: if (df != -1) return -1; break;
+                case N:
+                case S:
+                default: break;
+            }
+            return to;
+        }
+
+        inline bool is_slider_pinner(PieceKind k, Dir dir) noexcept
+        {
+            const bool diag = (dir == NE || dir == NW || dir == SE || dir == SW);
+            if (k == PieceKind::Queen) return true;
+            if (diag) return k == PieceKind::Bishop;
+            return k == PieceKind::Rook;
+        }
+
+        inline bool piece_on(const Board& b, int sq, Color c, PieceKind k) noexcept
+        {
+            return (b.bb(c, k) & bit(sq)) != 0;
+        }
+    } // namespace
 
     Pins compute_pins(const Board&b, Color side)
     {
-        Pins out;
-        BB kbb = b.bb(side, PieceKind::King);
-        if(!kbb) return out; // degenerate
-        int ks = lsb(kbb);
-        
-        const Color us = side;
+        Pins out{};
+
         const Color them = opposite(side);
-        BB occ = b.occ_all();
+        const BB kingBB  = b.bb(side, PieceKind::King);
+        if (!kingBB) return out;
 
-        // Explore 8 rays from the king. If first blocker is ours and second blocker
-        // (along same ray) is enemy rook/bishop/queen matching the ray, the first blocker is pinned.
-        constexpr Dir DIRS[8] = {N, S, E, W, NE, NW, SE, SW};
+        const int ks = lsb(kingBB);
 
-        for (Dir d : DIRS)
+        const Dir dirs[8] = { N, S, E, W, NE, NW, SE, SW };
+
+        for (Dir dir : dirs)
         {
-            // Walk out: record first friendly, then see if the next blocker is a matching enemy slider.
-            int step = static_cast<int>(d);
-            int prev = ks;
-            int firstFriend = -1;
-            BB segment = bit(ks); // start closed segment at king
+            int sq = ks;
+            int first_friend = -1;
 
-            for (int s = ks + step; s >= 0 && s < 64; s += step)
+            // Walk outwards
+            while (true)
             {
-                // edge wrap prevention (same as in ray_attacks_from)
-                int pf = file_of(prev), nf = file_of(s);
-                if (d == E || d == W || d == NE || d == NW || d == SE || d == SW)
+                sq = step_sq(sq, dir);
+                if (sq < 0) break;
+
+                const BB m = bit(sq);
+                if (!(b.occ_all() & m))
+                    continue; // empty
+
+                // Occupied:
+                if (b.occ(side) & m)
                 {
-                    if(std::abs(nf-pf) != 1) break;
+                    // First friendly piece could be pinned; second friendly breaks the ray.
+                    if (first_friend == -1) first_friend = sq;
+                    else break;
                 }
-                segment |= bit(s);
-
-                BB sq = bit(s);
-                if (!(occ & sq)) { prev = s; continue; } // empty, keep going
-
-                // Blocker encountered
-                if(b.occ(us) & sq)
+                else
                 {
-                    // first friendly along ray: only candidate can be pinned
-                    if (firstFriend == -1)
+                    // Enemy piece. If we have a candidate pinned piece and this enemy is a pinner, record.
+                    if (first_friend != -1)
                     {
-                        firstFriend = s;
-                        prev = s;
-                        continue;
-                    } else {
-                        // two friendless before any enemy slider => nobody pinned
-                    }
-                } else {
-                    // enemy piece - if we have a friendly before and enemy is a matching slider -> pin
-                    if (firstFriend != -1)
-                    {
-                        // classify direction kind of (df, dr)
-                        int df = file_of(s) - file_of(ks);
-                        int dr = rank_of(s) - rank_of(ks);
-
-                        PieceKind enemyK = PieceKind::Pawn; // init non-matching
-                        if (b.bb(them, PieceKind::Rook) & sq) enemyK = PieceKind::Rook;
-                        else if (b.bb(them, PieceKind::Bishop) & sq) enemyK = PieceKind::Bishop;
-                        else if (b.bb(them, PieceKind::Queen) & sq) enemyK = PieceKind::Queen;
-
-                        if (slider_matches_dir(enemyK, df, dr))
+                        PieceKind enemyKind = PieceKind::None;
+                        for (int k = 0; k < 6; ++k)
                         {
-                            out.pinned |= bit(firstFriend);
-                            out.ray_to_enemy[firstFriend] = segment; // closed king..enemy
+                            if (piece_on(b, sq, them, static_cast<PieceKind>(k)))
+                            {
+                                enemyKind = static_cast<PieceKind>(k);
+                                break;
+                            }
+                        }
+
+                        if (enemyKind != PieceKind::None && is_slider_pinner(enemyKind, dir))
+                        {
+                            out.pinned |= bit(first_friend);
+
+                            // Closed segment king..enemy (includes endpoints)
+                            BB seg = between_mask(ks, sq) | bit(ks) | bit(sq);
+                            out.ray_to_enemy[first_friend] = seg;
                         }
                     }
-                    break;
+                    break; // ray blocked by enemy piece regardless
                 }
             }
         }
+
         return out;
     }
-}
+} // namespace ch

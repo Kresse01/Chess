@@ -1,42 +1,41 @@
 #pragma once
 /**
  * @file ch_bishop.h
- * @brief Bishop movement masks using directional rays.
+ * @brief Bishop movement masks using ray attacks.
  * 
- * We form a "span" by stepping along NE, NW, SE, SW until an edge or blocker.
- * The span includes the first blocker (to represent a capture), then we intersect
- * it with empty/enemy/own to produce Quite/Attacks/All.
+ * Sliding piece logic:
+ *  - Generate attack rays in each diagonal direction until a blocker.
+ *  - The ray helper includes the blocker square (so captures are present).
+ *  - Filter out own occupancy.
+ *  - Then restrict to attacks-only / quiet-only depending on MovePhase.
  */
 
 #include "chess/pieces/ch_piece.h"
 
 namespace ch
 {
-    /** @brief Helper: full diagonal span from @p s including first blockers. */
-    inline BB bishop_span(int s, BB occ)
+    inline BB move(bishop_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts&)
     {
-        return ray_attacks_from(s, NE, occ)
-             | ray_attacks_from(s, NW, occ)
-             | ray_attacks_from(s, SE, occ)
-             | ray_attacks_from(s, SW, occ);
-    }
+        const BB occ_all = b.occ_all();
 
-    /**
-     * @brief Bishop movement mask from @p s for @p c.
-     */
-    inline BB move(bishop_t, Color c, int s, const Board& b, MovePhase phase, const MoveOpts&)
-    {
-        BB span = bishop_span(s, b.occ_all());
-        BB own = b.occ(c);
-        BB all = b.occ_all();
-        BB enn = b.occ(opposite(c));
+        BB atk = 0;
+        atk |= ray_attacks_from(fromSq, NE, occ_all);
+        atk |= ray_attacks_from(fromSq, NW, occ_all);
+        atk |= ray_attacks_from(fromSq, SE, occ_all);
+        atk |= ray_attacks_from(fromSq, SW, occ_all);
+
+        const BB own = b.occ(c);
+        const BB opp = b.occ(opposite(c));
+
+        // Never land on own pieces
+        atk &= ~own;
 
         switch (phase)
         {
-            case MovePhase::Quiet: return span & ~all;
-            case MovePhase::Attacks: return span & enn;
-            case MovePhase::All: return span & ~own;
+            case MovePhase::Attacks: return atk & opp;
+            case MovePhase::Quiet:   return atk & ~opp; // empty squares after removing own
+            case MovePhase::All:     return atk;
         }
         return 0;
     }
-}
+} // namespace ch

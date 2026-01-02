@@ -1,24 +1,33 @@
 #include "chess/analysis/ch_attack.h"
 
+#include "chess/core/ch_board.h"
+#include "chess/core/ch_bitboard.h"
+#include "chess/pieces/ch_piece.h" // move(...), MoveOpts, tags
+
 namespace ch
 {
-    // -- existing attackers_to / in_check you already added --
-
-    static inline BB white_pawns_attacking_to(int sq)
+    namespace
     {
-        BB tgt = bit(sq);
-        BB l = (tgt >> 7) & ~FILE_MASK[0];
-        BB r = (tgt >> 9) & ~FILE_MASK[7];
-        return l | r;
-    }
+        // Return squares (as a bitboard) where a WHITE pawn would stand to attack 'sq'.
+        // White pawn attacks are +7/+9, so attackers are at sq-7 and sq-9.
+        inline BB white_pawns_attacking_to(int sq) noexcept
+        {
+            const BB tgt = bit(sq);
+            const BB l = (tgt >> 7) & ~FILE_MASK[0]; // remove wrap source on file A
+            const BB r = (tgt >> 9) & ~FILE_MASK[7]; // remove wrap source on file H
+            return l | r;
+        }
 
-    static inline BB black_pawns_attacking_to(int sq)
-    {
-        BB tgt = bit(sq);
-        BB l = (tgt << 9) & ~FILE_MASK[0];
-        BB r = (tgt << 7) & ~FILE_MASK[7];
-        return l | r;
-    }
+        // Return squares (as a bitboard) where a BLACK pawn would stand to attack 'sq'.
+        // Black pawn attacks are -7/-9, so attackers are at sq+7 and sq+9.
+        inline BB black_pawns_attacking_to(int sq) noexcept
+        {
+            const BB tgt = bit(sq);
+            const BB l = (tgt << 9) & ~FILE_MASK[0]; // remove wrap source on file A
+            const BB r = (tgt << 7) & ~FILE_MASK[7]; // remove wrap source on file H
+            return l | r;
+        }
+    } // namespace
 
     BB attackers_to(const Board& b, int sq, Color by)
     {
@@ -84,44 +93,47 @@ namespace ch
             case PieceKind::King:
                 // King attacks = adjacent squares; do NOT include castling
                 return KING_ATK[fromSq] & ~b.occ(by);
+
+            case PieceKind::None:
+            default:
+                return 0;
         }
-        return 0;
     }
 
     BB attacks_side(const Board& b, Color by)
     {
         BB all = 0;
-        //Knights
+        
         for (BB pcs = b.bb(by,PieceKind::Knight); pcs; )
         {
             int s = lsb(pcs); pcs ^= bit(s);
             all |= attacks_from(b, by, PieceKind::Knight, s);
         }
-        //Bishops
+        
         for (BB pcs = b.bb(by, PieceKind::Bishop); pcs; )
         {
             int s = lsb(pcs); pcs ^= bit(s);
             all |= attacks_from(b, by, PieceKind::Bishop, s);
         }
-        // Rooks
+        
         for (BB pcs = b.bb(by, PieceKind::Rook); pcs; )
         {
-            int s = lsb(pcs); pcs^= bit(s);
+            int s = lsb(pcs); pcs ^= bit(s);
             all |= attacks_from(b, by, PieceKind::Rook, s);
         }
-        // Queens
+        
         for (BB pcs = b.bb(by, PieceKind::Queen); pcs; )
         {
             int s = lsb(pcs); pcs ^= bit(s);
             all |= attacks_from(b, by, PieceKind::Queen, s);
         }
-        // Pawns (capture directions only)
+        
         for (BB pcs = b.bb(by, PieceKind::Pawn); pcs; )
         {
             int s = lsb(pcs); pcs ^= bit(s);
             all |= attacks_from(b, by, PieceKind::Pawn, s);
         }
-        // King (no castling)
+        
         {
             BB k = b.bb(by, PieceKind::King);
             if (k) {
@@ -131,4 +143,4 @@ namespace ch
         }
         return all;
     }
-}
+} // namespace ch

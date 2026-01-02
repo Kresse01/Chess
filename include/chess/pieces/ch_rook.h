@@ -1,38 +1,34 @@
 #pragma once
 /**
  * @file ch_rook.h
- * @brief Rook movement masks using orthogonal rays
+ * @brief Rook sliding movement masks using ray attacks.
  */
 
 #include "chess/pieces/ch_piece.h"
 
 namespace ch
 {
-    /** @brief Helper: file+rank span from @p s including first blockers. */
-    inline BB rook_span(int s, BB occ)
+    inline BB move(rook_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts&)
     {
-        return ray_attacks_from(s, N, occ)
-             | ray_attacks_from(s, S, occ)
-             | ray_attacks_from(s, E, occ)
-             | ray_attacks_from(s, W, occ);
-    }
+        const BB occ_all = b.occ_all();
 
-    /**
-     * @brief Rook movement mask from @p s for @p c.
-     */
-    inline BB move(rook_t, Color c, int s, const Board& b, MovePhase phase, const MoveOpts&)
-    {
-        BB span = rook_span(s, b.occ_all());
-        BB own = b.occ(c);
-        BB all = b.occ_all();
-        BB enn = b.occ(opposite(c));
+        BB atk = 0;
+        atk |= ray_attacks_from(fromSq, N, occ_all);
+        atk |= ray_attacks_from(fromSq, S, occ_all);
+        atk |= ray_attacks_from(fromSq, E, occ_all);
+        atk |= ray_attacks_from(fromSq, W, occ_all);
 
-        switch(phase)
+        const BB own = b.occ(c);
+        const BB opp = b.occ(opposite(c));
+
+        atk &= ~own;
+
+        switch (phase)
         {
-            case MovePhase::Quiet: return span & ~all;
-            case MovePhase::Attacks: return span & enn;
-            case MovePhase::All: return span & ~own;
+            case MovePhase::Attacks: return atk & opp;
+            case MovePhase::Quiet:   return atk & ~opp;
+            case MovePhase::All:     return atk;
         }
         return 0;
     }
-}
+} // namespace ch

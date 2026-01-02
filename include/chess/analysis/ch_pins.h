@@ -1,25 +1,41 @@
 #pragma once
-#include "chess/core/ch_board.h"
-#include "chess/pieces/ch_piece.h"
+/**
+ * @file ch_pins.h
+ * @brief Compute line pins to the king for a side.
+ *
+ * A piece is "pinned" if moving it would expose the king to attack by an enemy
+ * sliding piece (rook/bishop/queen) along a line (rank/file/diagonal).
+ *
+ * Pins are used by legality filtering to restrict pseudo-legal destinations.
+ */
+
+#include "chess/core/ch_types.h"
 
 namespace ch
 {
+    class Board; // forward declaration
+
     /**
      * @brief Info about pieces line-pinned to their own king.
-     *  - pinned: all friendly pieces (excluding king) that are pinned.
-     *  - ray_to_enemy[sq]: for a pinned piece on 'sq', the *closest* ray squares between
-     *    the king and the pinning enemy inclusive (i.e., legal movement of that pinned
-     *    piece is constrained to this line). Empty for non-pinned squares.
+     *
+     *  - pinned: bitboard of all friendly pieces (excluding king) that are pinned.
+     *  - ray_to_enemy[sq]:
+     *        For a pinned piece on 'sq', a *closed* segment bitboard:
+     *            king ... pinned ... enemy_pinner
+     *        Legal moves for that piece are constrained to this segment.
+     *        For non-pinned squares, this entry is 0.
      */
-
-     struct Pins {
+    struct Pins
+    {
         BB pinned = 0;
         BB ray_to_enemy[64]{}; // closed segment: king .. enemy (includes both endpoints)
-     };
+    };
 
-     /**
-      * @brief Compute line pins for 'side'. Only rook / bishop / queen pins are considered.
-      * Knights and pawns cannot pin along lines
-      */
-     Pins compute_pins(const Board& b, Color side);
-}
+    /**
+     * @brief Compute line pins for @p side.
+     *
+     * Only rook / bishop / queen pins are considered (line pins).
+     * Knights and pawns cannot create line pins.
+     */
+    Pins compute_pins(const Board& b, Color side);
+} // namespace ch

@@ -18,6 +18,8 @@
  * are expressed entirely as **bitwise operations** on bitboards.
  */
 
+#include <cstdint>
+
 #include "chess/core/ch_board.h"
 #include "chess/core/ch_bitboard.h"
 
@@ -44,15 +46,16 @@ namespace ch
      * 
      *  - Attacks: only squares currently occupied by the opponent (captures).
      *  - Quiet: only empty squares (non-capture).
-     *  - All: union of both; equivalent to '~ownOCC' intersection with geometry.
+     *  - All: union of both (i.e. geometry masked by ~own occupancy).
      */
-    enum class MovePhase : uint8_t { Attacks, Quiet, All };
+    enum class MovePhase : std::uint8_t { Attacks, Quiet, All };
 
     /**
-     * @brief Contextual options that *shape* movement masks (no side effects).
+     * @brief Contextual options that shape movement masks (no side effects).
      * 
-     * These flags let you include context-sensitive moves (EP, castling, double push)
-     * without performing full legality checking or state mutation.
+     * These flags let the geometry layer include context-sensitive destinations
+     * (EP square, castling destination squares, pawn double push), without doing
+     * full legality checking or mutating the board.
      */
     struct MoveOpts
     {
@@ -94,12 +97,12 @@ namespace ch
      * @return bitboard of destination squares matching @p phase
      * @{
      */
-    BB move(pawn_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
-    BB move(knight_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
-    BB move(bishop_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
-    BB move(rook_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
-    BB move(queen_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
-    BB move(king_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
+    [[nodiscard]] BB move(pawn_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
+    [[nodiscard]] BB move(knight_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
+    [[nodiscard]] BB move(bishop_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
+    [[nodiscard]] BB move(rook_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
+    [[nodiscard]] BB move(queen_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
+    [[nodiscard]] BB move(king_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
     /** @} */
 
     /**
@@ -108,5 +111,5 @@ namespace ch
      * Use this when you have a @ref PieceKind at runtime. The heavy lifting stays
      * in the tag overloads so inlining still applies when the kind is known
      */
-    BB move(PieceKind k, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
-}
+    [[nodiscard]] BB move(PieceKind k, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts& o);
+} // namespace ch

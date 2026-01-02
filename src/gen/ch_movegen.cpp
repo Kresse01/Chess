@@ -1,5 +1,16 @@
 #include "chess/gen/ch_movegen.h"
+
 #include "chess/core/ch_bitboard.h"
+#include "chess/core/ch_board.h"
+
+#include "chess/analysis/ch_pins.h"
+#include "chess/analysis/ch_legality.h"
+
+#include "chess/gen/ch_legalize.h"
+#include "chess/gen/ch_king_legal.h"
+
+#include "chess/pieces/ch_piece.h"
+
 #include <cassert>
 
 namespace ch
@@ -8,7 +19,8 @@ namespace ch
     {
         for (BB m = mask; m; )
         {
-            int to = lsb(m); m ^= bit(to);
+            int to = lsb(m);
+            m ^= bit(to);
             out.push_back(Move::make(from, to, is_capture_mask));
         }
     }
@@ -50,7 +62,6 @@ namespace ch
         opts.ep_sq = b.ep_target();
 
         const Color them = opposite(side);
-        BB ownOcc = b.occ(side);
         BB enemyOcc = b.occ(them);
 
         //--- King (with castling legality) ---
@@ -59,21 +70,27 @@ namespace ch
             if (kbb)
             {
                 int ks = lsb(kbb);
-                // Legal king steps (no castling yet)
+                
+                // legal_king_moves() already:
+                //  - excludes stepping onto attacked squares
+                //  - excludes own-occupied squares
+                //  - includes castling destinations if legal
                 BB ksteps = legal_king_moves(b, side);
 
-                // Emit each destination and mark castling as special
                 for (BB m = ksteps; m; )
                 {
-                    int to =  lsb(m); m^= bit(to);
+                    int to =  lsb(m);
+                    m^= bit(to);
+
                     bool is_cap = (enemyOcc & bit(to)) != 0;
-                    bool special = is_castle_to(side, ks, to); // castle if e->g/c
+                    bool special = is_castle_to(side, ks, to); // mark castle for make/unmake
                     out.push_back(Move::make(ks, to, is_cap, 0, special));
                 }
             }
         }
         
-        if(cs.double_check) return; //only king moves are legal
+        // Double check: only king moves are legal
+        if(cs.double_check) return;
 
         // --- Knights ---
         for (BB pcs = b.bb(side, PieceKind::Knight); pcs; )
@@ -106,6 +123,7 @@ namespace ch
             int s = lsb(pcs); pcs ^= bit(s);
             BB pseudo = move(Rook, side, s, b, MovePhase::All, opts);
             BB legal = legalize_nonking_mask(b, pseudo, s, PieceKind::Rook, side, pins, cs);
+
             BB cap = legal & enemyOcc;
             BB qui = legal & ~enemyOcc;
             push_moves_from_mask(s, qui, false, out);
@@ -118,6 +136,7 @@ namespace ch
             int s = lsb(pcs); pcs ^= bit(s);
             BB pseudo = move(Queen, side, s, b, MovePhase::All, opts);
             BB legal = legalize_nonking_mask(b, pseudo, s, PieceKind::Queen, side, pins, cs);
+
             BB cap = legal & enemyOcc;
             BB qui = legal & ~enemyOcc;
             push_moves_from_mask(s, qui, false, out);
@@ -125,53 +144,51 @@ namespace ch
         }
 
         // --- Pawns ---
+        for (BB pcs = b.bb(side, PieceKind::Pawn); pcs; )
         {
-            // Use your pawn masks:
-            // quiet pushes via MovePhase::Quiet
-            // captures via MovePhase::Attacks
-            for (BB pcs = b.bb(side, PieceKind::Pawn); pcs; )
+            int s = lsb(pcs); pcs ^= bit(s);
+            BB pseudo = move(Pawn, side, s, b, MovePhase::All, opts);
+            BB legal = legalize_nonking_mask(b, pseudo, s, PieceKind::Pawn, side, pins, cs);
+
+            const int ep = b.ep_target();
+            const bool has_ep = (ep != -1);
+
+            BB cap = legal & enemyOcc;
+            BB qui = legal & ~enemyOcc;
+
+            // Promotions: if destination is last rank, emit 4 promotions instead of a normal pawn move.
+            for (BB q = qui; q; )
             {
-                int s = lsb(pcs); pcs ^= bit(s);
-
-                BB pq = move(Pawn, side, s, b, MovePhase::Quiet, opts);
-                BB pc = move(Pawn, side, s, b, MovePhase::Attacks, opts);
-
-                // Merge to ALL (so the legality filter can apply check/pin constraints uniformly)
-                BB pseudo_all = pc | pq;
-                BB legal_all = legalize_nonking_mask(b, pseudo_all, s, PieceKind::Pawn, side, pins, cs);
-
-                const int ep = opts.ep_sq;
-                const BB ep_bit = (ep>=0 ? bit(ep) : BB(0));
-
-                // Split captures/quiet after legalization
-                BB legal_ep = legal_all & ep_bit;
-                BB legal_capt = legal_all & enemyOcc;
-                BB legal_quiet = legal_all & ~(b.occ_all() | ep_bit); // only empties
-
-                // promotions (dest on last rank)
-                auto emit_range = [&](BB mask, bool isCap)
+                int to = lsb(q); q ^= bit(to);
+                const bool is_ep = has_ep && (to == ep);
+                if (is_ep)
                 {
-                    while (mask)
-                    {
-                        int to = lsb(mask); mask ^= bit(to);
-                        if (on_last_rank(side, to))
-                        {
-                            push_promotions(s, to, isCap, out);
-                        } else {
-                            out.push_back(Move::make(s, to, isCap));
-                        }
-                    }
-                };
-                emit_range(legal_quiet, false);
-                emit_range(legal_capt, true);
-
-                while(legal_ep)
-                {
-                    int to = lsb(legal_ep); legal_ep ^= bit(to);
-                    // EP can't be promoted square in standard chess
-                    out.push_back(Move::make(s,to,/*capture=*/true,/*promo=*/0,/*special=*/true));
+                    // En-passent: capture + special
+                    out.push_back(Move::make(s,to,/*capture*/true, /*promo*/ 0, /*special*/ true));
+                    continue;
                 }
+                if (on_last_rank(side, to))
+                    push_promotions(s, to, /*capture*/false, out);
+                else
+                    out.push_back(Move::make(s, to, /*capture*/false));
             }
+
+            for (BB c = cap; c; )
+            {
+                int to = lsb(c); c ^= bit(to);
+                if (on_last_rank(side, to))
+                    push_promotions(s, to, /*capture*/true, out);
+                else
+                    out.push_back(Move::make(s, to, /*capture*/true));
+            }
+
+            // NOTE: en-passant moves are already included in `legal` if:
+            //  - pseudo included EP target (via move(Pawn,...,MovePhase::All, opts))
+            //  - legalize_nonking_mask kept it (king_safe_after_ep)
+            //
+            // Those EP moves will appear either in `cap` or `qui` depending on how pawn move()
+            // encodes them. In your current design, EP is treated as a "capture" at the mask level,
+            // and make_move checks (pawn && capture && special) to detect EP.
         }
     }
-}
+} // namespace ch

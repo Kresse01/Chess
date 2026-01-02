@@ -1,34 +1,50 @@
 #pragma once
-#include "chess/core/ch_board.h"
-#include "chess/pieces/ch_piece.h"
+/**
+ * @file ch_attack.h
+ * @brief Attack / control queries used by king safety, checks, pins, and legality.
+ *
+ * This header is intentionally lightweight: it declares the public attack-query API.
+ * Implementations are in src/analysis/ch_attack.cpp and depend on bitboard tables,
+ * ray helpers, and per-piece geometry.
+ */
+
+#include "chess/core/ch_types.h"
 
 namespace ch
 {
-    BB attackers_to(const Board& b, int sq, Color by);
-    bool in_check(const Board& b, Color side);
-    inline bool is_attacked(const Board& b, int sq, Color by) { return attackers_to(b, sq, by) != 0; }
+    class Board; // forward declaration
 
     /**
-     * @brief Squares attacked (controlled) by a *single piece* at 'fromSq'.
-     * 
-     * Definition notes:
-     *  - Knights/Kings: standard leaper attacks, excluding own-occupied squares.
-     *  - Pawns: capture directions only (they "attack" diagonals, not he push)
-     *  - Sliders: ray until first blocker; include the blocker square only if it's the enemy.
-     *    (Equivalent to span & ~ownOcc.)
-     * 
-     * Implementation uses your 'move()' overloads with the right MovePhase:
-     *  - Pawns -> MovePhase::Attacks
-     *  - Others -> MovePhase::All (but own-occupied squares are excluded by the piece impl)
-     * 
-     * Castling is **not** considered an attack; en-passant target doesn't change attack.
+     * @brief Return a bitboard of attackers (pieces of color @p by) that attack square @p sq.
+     *
+     * Convention: returned bits are the *squares of the attacking pieces*.
+     */
+    BB attackers_to(const Board& b, int sq, Color by);
+
+    /**
+     * @brief True if @p side's king is currently in check.
+     */
+    bool in_check(const Board& b, Color side);
+
+    /**
+     * @brief True if square @p sq is attacked by color @p by.
+     */
+    inline bool is_attacked(const Board& b, int sq, Color by)
+    {
+        return attackers_to(b, sq, by) != 0;
+    }
+
+    /**
+     * @brief Squares attacked (controlled) by a *single piece* at @p fromSq.
+     *
+     * Notes:
+     *  - Pawns: capture directions only (they "attack" diagonals, not pushes).
+     *  - Castling is not an attack; en-passant target does not change attacks.
      */
     BB attacks_from(const Board& b, Color by, PieceKind kind, int fromSq);
 
     /**
-     * @brief Union of all squares attacked by side 'by' (all pieces).
-     * 
-     * Typical use: build a fast "danger map" to filter king moves or check conditions.
+     * @brief Union of all squares attacked by side @p by.
      */
     BB attacks_side(const Board& b, Color by);
-}
+} // namespace ch

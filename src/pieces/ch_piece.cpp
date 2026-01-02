@@ -1,4 +1,5 @@
 #include "chess/pieces/ch_piece.h"
+
 #include "chess/pieces/ch_knight.h"
 #include "chess/pieces/ch_bishop.h"
 #include "chess/pieces/ch_rook.h"
@@ -18,7 +19,10 @@ namespace ch
             case PieceKind::Rook: return move(Rook, c, s, b, ph, o);
             case PieceKind::Queen: return move(Queen, c, s, b, ph, o);
             case PieceKind::King: return move(King, c, s, b, ph, o);
+            
+            case PieceKind::None:
+            default:
+                return 0;
         }
-        return 0;
     }
 }

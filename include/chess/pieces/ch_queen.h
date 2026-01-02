@@ -1,30 +1,40 @@
 #pragma once
 /**
  * @file ch_queen.h
- * @brief Queen movement masks by composing bishop+rook spans.
+ * @brief Queen sliding movement masks using ray attacks (rook + bishop directions).
  */
 
-#include "chess/pieces/ch_bishop.h"
-#include "chess/pieces/ch_rook.h"
+#include "chess/pieces/ch_piece.h"
 
 namespace ch
 {
-    /**
-     * @brief Queen movement mask = rook_span | bishop_span, then intersect per phase.
-     */
-    inline BB move(queen_t, Color c, int s, const Board& b, MovePhase phase, const MoveOpts& o)
+    inline BB move(queen_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts&)
     {
-        BB span = bishop_span(s,b.occ_all()) | rook_span(s,b.occ_all());
-        BB own = b.occ(c);
-        BB all = b.occ_all();
-        BB enn = b.occ(opposite(c));
+        const BB occ_all = b.occ_all();
 
-        switch(phase)
+        BB atk = 0;
+        // Rook directions
+        atk |= ray_attacks_from(fromSq, N, occ_all);
+        atk |= ray_attacks_from(fromSq, S, occ_all);
+        atk |= ray_attacks_from(fromSq, E, occ_all);
+        atk |= ray_attacks_from(fromSq, W, occ_all);
+        // Bishop directions
+        atk |= ray_attacks_from(fromSq, NE, occ_all);
+        atk |= ray_attacks_from(fromSq, NW, occ_all);
+        atk |= ray_attacks_from(fromSq, SE, occ_all);
+        atk |= ray_attacks_from(fromSq, SW, occ_all);
+
+        const BB own = b.occ(c);
+        const BB opp = b.occ(opposite(c));
+
+        atk &= ~own;
+
+        switch (phase)
         {
-            case MovePhase::Quiet: return span & ~all;
-            case MovePhase::Attacks: return span & enn;
-            case MovePhase::All: return span & ~own;
+            case MovePhase::Attacks: return atk & opp;
+            case MovePhase::Quiet:   return atk & ~opp;
+            case MovePhase::All:     return atk;
         }
         return 0;
     }
-}
+} // namespace ch

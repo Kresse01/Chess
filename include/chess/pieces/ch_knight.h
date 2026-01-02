@@ -26,18 +26,20 @@
      * @param o (unused for knights; retained for signature uniformity)
      * @return destination squares as a bitboard
      */
-    inline BB move(knight_t, Color c, int s, const Board& b, MovePhase phase, const MoveOpts&)
+    inline BB move(knight_t, Color c, int fromSq, const Board& b, MovePhase phase, const MoveOpts&)
     {
-        BB atk = KNIGHT_ATK[s];
+        BB atk = KNIGHT_ATK[fromSq];
         BB own = b.occ(c);
-        BB all = b.occ_all();
-        BB enn = b.occ(opposite(c));
+        BB opp = b.occ(opposite(c));
+
+        // Never allow landing on own squares
+        atk &= ~own;
 
         switch(phase) {
-            case MovePhase::Quiet: return atk & ~all; // empty only
-            case MovePhase::Attacks: return atk & enn; // enemy only
-            case MovePhase::All: return atk & ~own; // empty+enemy (not own)
+            case MovePhase::Quiet: return atk & ~opp; // empty only
+            case MovePhase::Attacks: return atk & opp; // enemy only
+            case MovePhase::All: return atk; // empty+enemy (not own)
         }
-        return 0; //unreachable, silences warnings 
+        return 0;
     }
- }
+ } // namespace ch
